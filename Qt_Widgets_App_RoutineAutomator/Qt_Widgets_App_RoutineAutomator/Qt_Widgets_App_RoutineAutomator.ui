@@ -10,6 +10,12 @@
     <height>500</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <pointsize>12</pointsize>
+    <bold>true</bold>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>RoutineAutomator</string>
   </property>
@@ -131,56 +137,45 @@
      <string>▶ 실행</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox">
+   <widget class="QCheckBox" name="cb_autoStart">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>350</y>
-      <width>77</width>
+      <width>271</width>
       <height>21</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
     <property name="text">
-     <string>CheckBox</string>
+     <string>윈도우 시작 시 자동 실행 활성화</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox_2">
+   <widget class="QCheckBox" name="cb_trayIcon">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>380</y>
-      <width>77</width>
+      <width>461</width>
       <height>21</height>
      </rect>
     </property>
-    <property name="text">
-     <string>CheckBox</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>350</y>
-      <width>48</width>
-      <height>16</height>
-     </rect>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <bold>true</bold>
+     </font>
     </property>
     <property name="text">
-     <string>TextLabel</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>380</y>
-      <width>48</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>TextLabel</string>
+     <string>트레이 아이콘으로 실행 유지 (체크 해제 시 완료 후 종료)</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
@@ -192,21 +187,33 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
     <property name="text">
-     <string>TextLabel</string>
+     <string>상태 : </string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_4">
+   <widget class="QLabel" name="lb_status">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>70</x>
       <y>410</y>
-      <width>48</width>
+      <width>601</width>
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
     <property name="text">
-     <string>TextLabel</string>
+     <string>현재 진행 상황 TEXT</string>
     </property>
    </widget>
   </widget>
