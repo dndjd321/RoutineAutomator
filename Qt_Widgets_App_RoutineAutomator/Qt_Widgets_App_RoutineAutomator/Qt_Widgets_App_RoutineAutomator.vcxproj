@@ -103,6 +103,7 @@
     <QtUic Include="WF_RoutineReady.ui" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Procs.h" />
     <ClInclude Include="WF_RoutineOk.h" />
     <ClInclude Include="WF_RoutineReady.h" />
   </ItemGroup>

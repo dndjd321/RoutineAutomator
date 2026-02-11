@@ -20,28 +20,6 @@
    <string>RoutineAutomator</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QListWidget" name="qlw_procsList">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>70</y>
-      <width>701</width>
-      <height>271</height>
-     </rect>
-    </property>
-    <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
-    </property>
-    <property name="horizontalScrollBarPolicy">
-     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-    </property>
-    <property name="selectionBehavior">
-     <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-    </property>
-    <property name="itemAlignment">
-     <set>Qt::AlignmentFlag::AlignCenter</set>
-    </property>
-   </widget>
    <widget class="QPushButton" name="pbtn_addProc">
     <property name="geometry">
      <rect>
@@ -215,6 +193,68 @@
     <property name="text">
      <string>현재 진행 상황 TEXT</string>
     </property>
+   </widget>
+   <widget class="QTreeWidget" name="tw_procList">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>60</y>
+      <width>700</width>
+      <height>258</height>
+     </rect>
+    </property>
+    <property name="verticalScrollBarPolicy">
+     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
+    </property>
+    <property name="horizontalScrollBarPolicy">
+     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+    </property>
+    <property name="columnCount">
+     <number>5</number>
+    </property>
+    <attribute name="headerCascadingSectionResizes">
+     <bool>true</bool>
+    </attribute>
+    <column>
+     <property name="text">
+      <string>순서</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>타입</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>이름 / 경로</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>지연</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>중복방지</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </column>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">

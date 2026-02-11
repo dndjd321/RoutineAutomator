@@ -1,36 +1,88 @@
-#include "Qt_Widgets_App_RoutineAutomator.h"
+ï»¿#include "Qt_Widgets_App_RoutineAutomator.h"
+#include "Procs.h"  // í”„ë¡œì„¸ìŠ¤ ë‚´ìš© ì •ì˜ í—¤ë” íŒŒì¼
+#include <QScreen>;
+#include <QGuiApplication>
+
+
+// í”„ë¡œì„¸ìŠ¤ ë‚´ìš© ì„ ì–¸
+Procs proc;
+
+// QTreeWidget Item ì¶”ê°€ í›„ ê°€ìš´ë° ì •ë ¬í•˜ëŠ” í•¨ìˆ˜ ì„ ì–¸
+void SetTextAlignCenter(QTreeWidget* qtw);
+
+// QTreeWidget Item ì¶”ê°€ í›„ ê°€ìš´ë° ì •ë ¬í•˜ëŠ” í•¨ìˆ˜ ì •ì˜
+void SetTextAlignCenter(QTreeWidget* qtw) {
+    //if (!item) { return; }   // itemì´ NULL ì¼ ê²½ìš°ë¥¼ ë°©ì§€
+
+    QTreeWidgetItem* item = new QTreeWidgetItem(qtw);
+
+    for (int i = 0; i < qtw->columnCount(); i++) {
+        item->setTextAlignment(i, Qt::AlignCenter);
+    }
+}
 
 Qt_Widgets_App_RoutineAutomator::Qt_Widgets_App_RoutineAutomator(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
 
-    
-    // ¿¬°á °ø½Ä: connect(½ÅÈ£º¸³¾°´Ã¼, ½ÅÈ£Á¾·ù, ¹Ş´Â°´Ã¼, ½ÇÇàÇÒÇÔ¼ö);
-    // ¿¹½Ã : connect(ui.pbtn_addProc, &QPushButton::clicked, this, &Qt_Widgets_App_RoutineAutomator::onAddProcClicked);
+    #pragma region ë©”ì¸ ì°½ í¬ê¸° ê³ ì •, 
+    // ë©”ì¸ ì°½ í¬ê¸° ê³ ì •
+    this->setFixedSize(700, 500);
+    #pragma endregion
 
-    // ÇÁ·Î¼¼½º Ãß°¡ ÇÔ¼ö ¿¬°á
+    #pragma region ë©”ì¸ ì°½ ë‹«ê¸°, ìµœì†Œí™” í™œì„±í™”. ìµœëŒ€í™”ëŠ” ë¹„í™œì„±í™”
+    // ë©”ì¸ ì°½ ë‹«ê¸°, ìµœì†Œí™” ë²„íŠ¼ë§Œ í™œì„±í™”. ìµœëŒ€í™”ëŠ” ëˆŒëŸ¬ë„ í™”ë©´ì´ ì»¤ì§€ì§€ëŠ” ì•ŠìŒ.
+    this->setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
+    #pragma endregion
+
+    #pragma region ë©”ì¸ ì°½ ëª¨ë‹ˆí„° ì¤‘ì•™ìœ¼ë¡œ ìœ„ì¹˜ì‹œí‚¤ê¸°
+    // ë©”ì¸ ì°½ ëª¨ë‹ˆí„° ì¤‘ì•™ìœ¼ë¡œ ìœ„ì¹˜ì‹œí‚¤ê¸°
+    // ëª¨ë‹ˆí„° í™”ë©´ ì •ë³´ ê°€ì ¸ì˜¤ê¸°
+    QScreen* q_screen = QGuiApplication::primaryScreen();
+    QRect q_rect = q_screen->geometry();
+    // í™”ë©´ ì¤‘ì‹¬ ì¢Œí‘œ êµ¬í•˜ê¸°
+    int rect_x = (q_rect.width() - this->width()) / 2;
+    int rect_y = (q_rect.height() - this->height()) / 2;
+    // ë©”ì¸ ì°½ ìœ„ì¹˜ ì´ë™
+    this->move(rect_x, rect_y);
+    #pragma endregion
+
+    #pragma region QTreeWidget Column Width Setting
+    // QTreeWidget Column Width Setting
+    ui.tw_procList->setColumnWidth(0, 75);
+    ui.tw_procList->setColumnWidth(1, 75);
+    ui.tw_procList->setColumnWidth(2, 370);
+    ui.tw_procList->setColumnWidth(3, 75);
+    #pragma endregion
+
+
+    
+    // ì—°ê²° ê³µì‹: connect(ì‹ í˜¸ë³´ë‚¼ê°ì²´, ì‹ í˜¸ì¢…ë¥˜, ë°›ëŠ”ê°ì²´, ì‹¤í–‰í• í•¨ìˆ˜);
+    // ì˜ˆì‹œ : connect(ui.pbtn_addProc, &QPushButton::clicked, this, &Qt_Widgets_App_RoutineAutomator::onAddProcClicked);
+
+    // í”„ë¡œì„¸ìŠ¤ ì¶”ê°€ í•¨ìˆ˜ ì—°ê²°
     connect(ui.pbtn_addProc, &QPushButton::clicked, this, &Qt_Widgets_App_RoutineAutomator::onAddProcClickFunc);
     
-    // ÇÁ·Î¼¼½º Á¦°Å ÇÔ¼ö ¿¬°á
+    // í”„ë¡œì„¸ìŠ¤ ì œê±° í•¨ìˆ˜ ì—°ê²°
     connect(ui.pbtn_delProc, &QPushButton::clicked, this, &Qt_Widgets_App_RoutineAutomator::onRemoveProcClickFunc);
 
-    // ÇÁ·Î¼¼½º ¼ø¼­ À§·Î ÀÌµ¿ ÇÔ¼ö ¿¬°á
+    // í”„ë¡œì„¸ìŠ¤ ìˆœì„œ ìœ„ë¡œ ì´ë™ í•¨ìˆ˜ ì—°ê²°
     connect(ui.pbtn_upProc, &QPushButton::clicked, this, &Qt_Widgets_App_RoutineAutomator::onMoveUpProcClickFunc);
 
-    // ÇÁ·Î¼¼½º ¼ø¼­ ¾Æ·¡·Î ÀÌµ¿ ÇÔ¼ö ¿¬°á
+    // í”„ë¡œì„¸ìŠ¤ ìˆœì„œ ì•„ë˜ë¡œ ì´ë™ í•¨ìˆ˜ ì—°ê²°
     connect(ui.pbtn_downProc, &QPushButton::clicked, this, &Qt_Widgets_App_RoutineAutomator::onMoveDownProcClickFunc);
 
-    // ÇÁ·Î¼¼½º ½ÇÇà ÇÔ¼ö ¿¬°á
+    // í”„ë¡œì„¸ìŠ¤ ì‹¤í–‰ í•¨ìˆ˜ ì—°ê²°
     connect(ui.pbtn_runProc, &QPushButton::clicked, this, &Qt_Widgets_App_RoutineAutomator::onRunProcClickFunc);
 
-    // À©µµ¿ì ½ÃÀÛ ½Ã ÇÁ·Î±×·¥ ÀÚµ¿ ½ÇÇà Ã¼Å©¹Ú½º ¼³Á¤ ÇÔ¼ö ¿¬°á
+    // ìœˆë„ìš° ì‹œì‘ ì‹œ í”„ë¡œê·¸ë¨ ìë™ ì‹¤í–‰ ì²´í¬ë°•ìŠ¤ ì„¤ì • í•¨ìˆ˜ ì—°ê²°
     connect(ui.cb_autoStart, &QCheckBox::checkStateChanged, this, &Qt_Widgets_App_RoutineAutomator::onStatusChangeFunc );
 
-    // Æ®·¹ÀÌ ¾ÆÀÌÄÜÀ¸·Î ½ÇÇà À¯Áö ¼³Á¤ ÇÔ¼ö ¿¬°á
+    // íŠ¸ë ˆì´ ì•„ì´ì½˜ìœ¼ë¡œ ì‹¤í–‰ ìœ ì§€ ì„¤ì • í•¨ìˆ˜ ì—°ê²°
     connect(ui.cb_trayIcon, &QCheckBox::checkStateChanged, this, &Qt_Widgets_App_RoutineAutomator::onTrayIconCheckFunc);
 
-    // ÇöÀç ÁøÇà »óÈ² label ¼³Á¤ ÇÔ¼ö ¿¬°á
+    // í˜„ì¬ ì§„í–‰ ìƒí™© label ì„¤ì • í•¨ìˆ˜ ì—°ê²°
     connect(ui.lb_status, &QLabel::setText, this, &Qt_Widgets_App_RoutineAutomator::onStatusChangeFunc);
 
 
@@ -40,42 +92,59 @@ Qt_Widgets_App_RoutineAutomator::~Qt_Widgets_App_RoutineAutomator()
 {}
 
 
-// ÇÁ·Î¼¼½º Ãß°¡ ÇÔ¼ö ·ÎÁ÷
+// í”„ë¡œì„¸ìŠ¤ ì¶”ê°€ í•¨ìˆ˜ ë¡œì§
 void Qt_Widgets_App_RoutineAutomator::onAddProcClickFunc() {
-    
+    proc.num = 1;
+    proc.delay = 1;
+    proc.dup = true;
+    proc.type = "WEB";
+    proc.info.name = "ì¹´í†¡";
+    proc.info.dir = "ë‚´ PC";
+
+    QTreeWidgetItem* tree_Item = new QTreeWidgetItem(ui.tw_procList);
+    tree_Item->setData(0, Qt::DisplayRole, proc.num);
+    tree_Item->setData(1, Qt::DisplayRole, proc.type);
+    tree_Item->setData(2, Qt::DisplayRole, proc.info.name + " / " + proc.info.dir);
+    tree_Item->setData(3, Qt::DisplayRole, proc.delay);
+    tree_Item->setCheckState(4, proc.dup ? Qt::Checked : Qt::Unchecked);
+ 
+    ui.tw_procList->addTopLevelItem(tree_Item);
+
+    SetTextAlignCenter(ui.tw_procList);
+
 }
 
-// ÇÁ·Î¼¼½º Á¦°Å ÇÔ¼ö ·ÎÁ÷
+// í”„ë¡œì„¸ìŠ¤ ì œê±° í•¨ìˆ˜ ë¡œì§
 void Qt_Widgets_App_RoutineAutomator::onRemoveProcClickFunc() {
 
 }
 
-// ÇÁ·Î¼¼½º ¼ø¼­ À§·Î ÀÌµ¿ÇÏ´Â ÇÔ¼ö ·ÎÁ÷
+// í”„ë¡œì„¸ìŠ¤ ìˆœì„œ ìœ„ë¡œ ì´ë™í•˜ëŠ” í•¨ìˆ˜ ë¡œì§
 void Qt_Widgets_App_RoutineAutomator::onMoveUpProcClickFunc() {
 
 }
 
-// ÇÁ·Î¼¼½º ¼ø¼­ ¾Æ·¡·Î ÀÌµ¿ÇÏ´Â ÇÔ¼ö ·ÎÁ÷
+// í”„ë¡œì„¸ìŠ¤ ìˆœì„œ ì•„ë˜ë¡œ ì´ë™í•˜ëŠ” í•¨ìˆ˜ ë¡œì§
 void Qt_Widgets_App_RoutineAutomator::onMoveDownProcClickFunc() {
 
 }
 
-// ÇÁ·Î¼¼½º ½ÇÇà ÇÔ¼ö ·ÎÁ÷
+// í”„ë¡œì„¸ìŠ¤ ì‹¤í–‰ í•¨ìˆ˜ ë¡œì§
 void Qt_Widgets_App_RoutineAutomator::onRunProcClickFunc() {
 
 }
 
-// À©µµ¿ì ½ÃÀÛ ½Ã ÀÚµ¿ ½ÇÇà ¼³Á¤ ÇÔ¼ö ·ÎÁ÷
+// ìœˆë„ìš° ì‹œì‘ ì‹œ ìë™ ì‹¤í–‰ ì„¤ì • í•¨ìˆ˜ ë¡œì§
 void Qt_Widgets_App_RoutineAutomator::onAutoStartCheckFunc() {
 
 }
 
-// Æ®·¹¸® ¾ÆÀÌÄÜ ¼³Á¤ ÇÔ¼ö ·ÎÁ÷
+// íŠ¸ë ˆë¦¬ ì•„ì´ì½˜ ì„¤ì • í•¨ìˆ˜ ë¡œì§
 void Qt_Widgets_App_RoutineAutomator::onTrayIconCheckFunc() {
 
 }
 
-// »óÅÂ Label Text º¯°æ ÇÔ¼ö ·ÎÁ÷
+// ìƒíƒœ Label Text ë³€ê²½ í•¨ìˆ˜ ë¡œì§
 void Qt_Widgets_App_RoutineAutomator::onStatusChangeFunc() {
 
 }

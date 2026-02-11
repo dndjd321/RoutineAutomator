@@ -62,5 +62,8 @@
     <ClInclude Include="WF_RoutineReady.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Procs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
