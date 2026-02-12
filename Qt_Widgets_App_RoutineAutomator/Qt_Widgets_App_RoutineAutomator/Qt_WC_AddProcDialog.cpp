@@ -1,6 +1,7 @@
 #include "Qt_WC_AddProcDialog.h"
 #include <qfiledevice.h>
 #include <qfileinfo.h>
+#include <qfiledialog.h>
 #include <QScreen>;
 #include <QGuiApplication>
 
@@ -10,20 +11,27 @@ Qt_WC_AddProcDialog::Qt_WC_AddProcDialog(QWidget *parent)
 	ui.setupUi(this);
 
 
-	// ¿¬°á °ø½Ä: connect(½ÅÈ£º¸³¾°´Ã¼, ½ÅÈ£Á¾·ù, ¹Þ´Â°´Ã¼, ½ÇÇàÇÒÇÔ¼ö);
-	// ¿¹½Ã : connect(ui.pbtn_addProc, &QPushButton::clicked, this, &Qt_Widgets_App_RoutineAutomator::onAddProcClicked);
+	// ì—°ê²° ê³µì‹: connect(ì‹ í˜¸ë³´ë‚¼ê°ì²´, ì‹ í˜¸ì¢…ë¥˜, ë°›ëŠ”ê°ì²´, ì‹¤í–‰í• í•¨ìˆ˜);
+	// ì˜ˆì‹œ : connect(ui.pbtn_addProc, &QPushButton::clicked, this, &Qt_Widgets_App_RoutineAutomator::onAddProcClicked);
 	
-	// ³»PC ¿¡¼­ ÇÁ·Î±×·¥ Ã£°í ¼±ÅÃÇÏ´Â ÇÔ¼ö
+	// ë‚´ PC ì—ì„œ í”„ë¡œê·¸ëž¨ ì°¾ê¸° ë° ì„ íƒ í•¨ìˆ˜ ì„ ì–¸
 	connect(ui.pbtn_procSearch, &QPushButton::clicked, this, &Qt_WC_AddProcDialog::SearchProcsFunc);
 
-	// Type º¯°æ µÇ¾úÀ» ¶§ le_url Enabled true or false ¼³Á¤ÇÏ´Â ÇÔ¼ö
-	connect(ui.rb_chkApp, &QPushButton::isChecked, this, &Qt_WC_AddProcDialog::CheckChangeTypeFunc);
-	connect(ui.rb_chkWeb, &QPushButton::isChecked, this, &Qt_WC_AddProcDialog::CheckChangeTypeFunc);
+	// Type ì„ íƒ ì‹œ le_url Enabled true or false ì²˜ë¦¬ í•¨ìˆ˜ ì„ ì–¸
+	//connect(ui.rb_chkApp, &QRadioButton::clicked, this, &Qt_WC_AddProcDialog::CheckChangeTypeFunc);
+	//connect(ui.rb_chkWeb, &QRadioButton::clicked, this, &Qt_WC_AddProcDialog::CheckChangeTypeFunc);
+	connect(ui.rb_chkApp, &QRadioButton::clicked, this, [=]() {
+		CheckChangeTypeFunc(ui.rb_chkApp);
+		});
+	connect(ui.rb_chkWeb, &QRadioButton::clicked, this, [=]() {
+		CheckChangeTypeFunc(ui.rb_chkWeb);
+		});
 	
-	// Procs ¿¡ µ¥ÀÌÅÍ Ãß°¡ ÈÄ È­¸é Á¾·á ( QMainWindow ¿¡¼­ µ¥ÀÌÅÍ °¡Á®°¥ °ÅÀÓ) 
+	
+	// Procs ê°’ ì €ìž¥í•˜ê¸° ( ì´í›„ QMainWindow ì—ì„œ ê°’ ë“¤ê³ ì™€ì„œ QTreeWidgetì— Item ë“±ë¡ ) 
 	connect(ui.pbtn_AddProcOk, &QPushButton::clicked, this, &Qt_WC_AddProcDialog::AddProcOkFunc);
 
-	// µ¥ÀÌÅÍ Ãß°¡ ¾øÀÌ È­¸é Á¾·á
+	// í”„ë¡œê·¸ëž¨ ë“±ë¡ X 
 	connect(ui.pbtn_AddProcCancle, &QPushButton::clicked, this, &Qt_WC_AddProcDialog::AddProcCancleFunc);
 
 
@@ -35,23 +43,62 @@ Qt_WC_AddProcDialog::~Qt_WC_AddProcDialog()
 
 
 void Qt_WC_AddProcDialog::SearchProcsFunc() {
+	/*QFileDialog qfd;
+
+	qfd.open();
+
+	qfd.close();*/
+
+	QString filePath = QFileDialog::getOpenFileName(
+		this,								// ë¶€ëª¨ ìœ„ì ¯
+		"í”„ë¡œê·¸ëž¨ ì„ íƒ",					// dialog ì œëª©
+		"C:\\",								// ì‹œìž‘ ê²½ë¡œ
+		"ì‹¤í–‰íŒŒì¼(*.exe);;ëª¨ë“  íŒŒì¼(*.*)"	// íŒŒì¼ í•„í„°(êµ¬ë¶„ìžëŠ” ;;)
+	);
+	
+	// filePath ê°’ì´ ë¹„ì–´ìžˆì§€ ì•Šë‹¤ë©´ ì¡°ê±´ë¶€ ì‹¤í–‰
+	if (!filePath.isEmpty()) {
+		QFileInfo qf_info(filePath);
+		QString fileName = qf_info.baseName();	// í”„ë¡œê·¸ëž¨ ì´ë¦„ë§Œ ì¶”ì¶œ, í™•ìž¥ìž X
+		ui.le_procName->setText(fileName);
+		ui.le_procDir->setText(filePath);
+
+		if (fileName.contains("chrome") || fileName.contains("firefox") || fileName.contains("opera") || fileName.contains("explorer")) {
+			//ui.rb_chkWeb->QRadioButton::isChecked();
+			CheckChangeTypeFunc(ui.rb_chkWeb);
+		}
+		else{
+			//ui.rb_chkApp->QRadioButton::isChecked();
+			CheckChangeTypeFunc(ui.rb_chkApp);
+		}
+	}
 
 }
 
-void Qt_WC_AddProcDialog::CheckChangeTypeFunc() {
-
+void Qt_WC_AddProcDialog::CheckChangeTypeFunc(QRadioButton* qrb) {
+	qrb->setChecked(true);
 }
 
 void Qt_WC_AddProcDialog::AddProcOkFunc() {
-	// Procs¿¡ µ¥ÀÌÅÍ ´ã±â
+	// Procs ë°ì´í„° ì €ìž¥
+	Procs proc;
 
+	proc.type = ui.rb_chkApp->QRadioButton::isChecked() == true ? "APP" : "WEB";	// íƒ€ìž…
+	proc.delay = ui.sb_chkDelay->value();				// ë”œë ˆì´
+	proc.dup = ui.cb_chkDup->QCheckBox::isChecked();	// ì¤‘ë³µ
+	proc.info.name = ui.le_procName->QLineEdit::text();	// í”„ë¡œê·¸ëž¨ ëª…
+	proc.info.dir = ui.le_procDir->QLineEdit::text();	// í”„ë¡œê·¸ëž¨ ë””ë ‰í† ë¦¬
+	proc.info.url = ui.le_url->QLineEdit::text();		// url ê²½ë¡œ ex ) https://www.naver.com/
 
-	// ui ´Ý±â
-	this->reject();
+	// .h ì— ì„ ì–¸ë˜ì–´ ìžˆëŠ” Procsì— ê°’ ì €ìž¥
+	setProc(proc);
+
+	// ui ë‹«ê¸°
+	this->accept();
 }
 
 void Qt_WC_AddProcDialog::AddProcCancleFunc() {
-	// ui ´Ý±â
+	// ui ë‹«ê¸°
 	this->reject();
 }
 

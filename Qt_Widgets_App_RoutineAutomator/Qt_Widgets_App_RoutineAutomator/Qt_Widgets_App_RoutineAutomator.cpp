@@ -102,20 +102,12 @@ void Qt_Widgets_App_RoutineAutomator::onAddProcClickFunc() {
 
     // 호출
     if (add_dialog.exec() == QDialog::Accepted) {
-        // 임시 - 나중에 이 부분은 제거 예정
-        proc.num = 1;
-        proc.delay = 1;
-        proc.dup = true;
-        proc.type = "WEB";
-        proc.info.name = "카톡";
-        proc.info.dir = "내 PC";
-
+        
         // 저장된 내용 들고오기
-        Procs procdata = add_dialog.getProcsData();
-
+        Procs proc = add_dialog.getProc();
 
         QTreeWidgetItem* tree_Item = new QTreeWidgetItem(ui.tw_procList);
-        tree_Item->setData(0, Qt::DisplayRole, proc.num);
+        tree_Item->setData(0, Qt::DisplayRole, ui.tw_procList->topLevelItemCount());
         tree_Item->setData(1, Qt::DisplayRole, proc.type);
         tree_Item->setData(2, Qt::DisplayRole, proc.info.name + " / " + proc.info.dir);
         tree_Item->setData(3, Qt::DisplayRole, proc.delay);

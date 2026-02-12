@@ -13,8 +13,7 @@ public:
 	~Qt_WC_AddProcDialog();
 
 
-	// Procs¿¡ ´ëÇÑ µ¥ÀÌÅÍ¸¦ ÀúÀåÇÒ Procs °ª ¹İÈ¯ÇÏ´Â ÇÔ¼ö »ı¼ºÇÏ±â
-	// QMainWindowÀÎ RoutineAutomator ¿¡¼­ »ç¿ë °¡´ÉÇÏµµ·Ï public¿¡¼­ ¼±¾ğ
+	// QMainWindowì¸ RoutineAutomator ì—ì„œ ê°’ ê°€ì ¸ì˜¬ ë•Œ í•¨ìˆ˜ í˜¸ì¶œì´ ê°€ëŠ¥í•˜ë„ë¡ publicì—ì„œ ì„ ì–¸
 	Procs getProc() { return _proc; }
 	void setProc(Procs proc) { _proc = proc; }
 
@@ -23,11 +22,11 @@ private:
 	Ui::Qt_WC_AddProcDialogClass ui;
 	Procs _proc;
 
-private slots:	// AddProcDialog.h ¿¡¼­ »ç¿ëÇÒ ÀÌº¥Æ® ÇÔ¼öµé ¼±¾ğ
-	void SearchProcsFunc();		// ³» PC ¿¡ ÀÖ´Â ÇÁ·Î±×·¥ Ã£¾Æ¼­ ¼±ÅÃÇÏ´Â ÇÔ¼ö
-	void CheckChangeTypeFunc();	// Type º¯°æ¿¡ µû¶ó le_url Enabled true or false Ã³¸® ½ÃÅ°´Â ÇÔ¼ö
-	void AddProcOkFunc();		// ±âÀÔÇÑ ³»¿ëÀ» Åä´ë·Î ·çÆ¾ Ãß°¡ÇÏ´Â ÇÔ¼ö 
-	void AddProcCancleFunc();	// ·çÆ¾ Ãß°¡ °ÅºÎ ÇÔ¼ö 
+private slots:	// AddProcDialog.h í•¨ìˆ˜ ì„ ì–¸
+	void SearchProcsFunc();		// ë‚´ PC ì—ì„œ í”„ë¡œê·¸ë¨ ì°¾ê¸° ë° ì„ íƒ í•¨ìˆ˜ ( FileDialog ì‚¬ìš© ì˜ˆì • )
+	void CheckChangeTypeFunc(QRadioButton* qrb);	// Type ë³€ê²½ ë  ë•Œ le_url Enabled true or false ì„¤ì • í•¨ìˆ˜
+	void AddProcOkFunc();		// í”„ë¡œê·¸ë¨ ì¶”ê°€ í›„ QDialog ë‹«ê¸°
+	void AddProcCancleFunc();	// í”„ë¡œê·¸ë¨ ì¶”ê°€ ì—†ì´ QDialog ë‹«ê¸°
 
 };
 

@@ -89,6 +89,9 @@
    </property>
   </widget>
   <widget class="QRadioButton" name="rb_chkApp">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>140</x>
@@ -105,6 +108,9 @@
    </property>
   </widget>
   <widget class="QRadioButton" name="rb_chkWeb">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>210</x>

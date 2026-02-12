@@ -3,16 +3,16 @@
 #include <Qstring>
 
 struct ProcInfo {
-	QString name = "";	// ¸íÄª
-	QString dir = "";	// °æ·Î
+	QString name = "";	// í”„ë¡œê·¸ë¨ ëª…
+	QString dir = "";	// ë””ë ‰í† ë¦¬ ìœ„ì¹˜
 	QString url = "";	// URL
 };
 
 struct Procs {
-	int num = 0;				// ¼ø¼­
-	QString type = "";			// Å¸ÀÔ ( web / app )
-	ProcInfo info = ProcInfo();	// ¸íÄª + °æ·Î
-	int delay = 3;				// ½ÇÇà Áö¿¬ ½Ã°£ ( µô·¹ÀÌ )
-	bool dup = false;			// Áßº¹ Ã¼Å© À¯¹«
+	int num = 0;				// ìˆœì„œ
+	QString type = "";			// íƒ€ì… ( web / app )
+	ProcInfo info = ProcInfo();	// í”„ë¡œê·¸ë¨ ì •ë³´
+	int delay = 3;				// í”„ë¡œê·¸ë¨ ì‹¤í–‰ ì§€ì—°ì‹œê°„ ( ë”œë ˆì´ )
+	bool dup = false;			// ì¤‘ë³µ ì²´í¬
 };
 

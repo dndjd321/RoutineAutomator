@@ -18,25 +18,23 @@ private:
     Ui::Qt_Widgets_App_RoutineAutomatorClass ui;
 
 
-    QList<Procs> procs; // C++ ¿¡¼­´Â ÀÌ·¸°Ô ¼±¾ğÇÏ´Â °ÍÀÌ ÀÏ¹İÀûÀÓ.
-    //QList<Procs> procs = QList<Procs>(); // ÀÌ ¹æ½Äµµ »ç¿ëÇØµµ ¹®Á¦´Â ¾øÁö¸¸, ÇÁ·Î±×·¥ ½ÃÀÛ ½Ã ºÒÇÊ¿äÇÏ°Ô ¸Ş¸ğ¸® ¿µ¿ªÀ» Àâ¾Æ¸Ô±âµµ ÇÔ. ( C# ½ºÅ¸ÀÏ )
+    QList<Procs> procs; // C++ ì—ì„œ ì¼ë°˜ì ìœ¼ë¡œ ì„ ì–¸í•˜ëŠ” ë°©ì‹
+    //QList<Procs> procs = QList<Procs>(); //  C# ë°©ì‹ 
 
-private slots:  // ÀÌº¥Æ® ¹ß»ı ½Ã ½ÇÇàÇÒ ÇÔ¼ö ¼±¾ğ ±¸¿ª
+private slots:  // UI ì´ë²¤íŠ¸ ì²˜ë¦¬ í•¨ìˆ˜
 
-    // »ó´Ü ÇÁ·Î¼¼½º Ãß°¡, Á¦°Å, À§ ¾Æ·¡ ¼ø¼­ ÀÌµ¿, ½ÇÇà ÇÔ¼ö
+    // ë²„íŠ¼ í´ë¦­ ì œì–´ í•¨ìˆ˜
     void onAddProcClickFunc();
     void onRemoveProcClickFunc();
     void onMoveUpProcClickFunc();
     void onMoveDownProcClickFunc();
     void onRunProcClickFunc();
 
-    // ÇÏ´Ü Ã¼Å©¹Ú½º ±¸¿ª ÇÔ¼ö
-    // À©µµ¿ì ½ÃÀÛ ½Ã ÀÚµ¿½ÇÇà
-    // Æ®·¹ÀÌ ¾ÆÀÌÄÜÀ¸·Î ½ÇÇà À¯Áö
+    // ì²´í¬ë°•ìŠ¤ ì œì–´ í•¨ìˆ˜
     void onAutoStartCheckFunc();
     void onTrayIconCheckFunc();
 
-    // ÃÖÇÏ´Ü »óÅÂ Ã¼Å© ÇÔ¼ö
+    // í˜„ì¬ ì§„í–‰ ìƒí™© ì œì–´ í•¨ìˆ˜
     void onStatusChangeFunc();
 
 };
