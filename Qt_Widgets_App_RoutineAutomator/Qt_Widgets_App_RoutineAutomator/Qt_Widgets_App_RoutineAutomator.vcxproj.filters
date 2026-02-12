@@ -40,30 +40,41 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WF_RoutineOk.cpp">
+    <ClCompile Include="Qt_WC_AddProcDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WF_RoutineReady.cpp">
+    <ClCompile Include="Qt_WC_RoutineOk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Qt_WC_RoutineReady.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="WF_RoutineReady.ui">
+    <QtUic Include="Qt_WC_AddProcDialog.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="WF_RoutineOk.ui">
+    <QtUic Include="Qt_WC_RoutineOk.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="Qt_WC_RoutineReady.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="WF_RoutineOk.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WF_RoutineReady.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Procs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="Qt_WC_AddProcDialog.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Qt_WC_RoutineOk.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Qt_WC_RoutineReady.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
 </Project>

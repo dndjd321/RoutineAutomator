@@ -92,20 +92,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="WF_RoutineOk.cpp" />
-    <ClCompile Include="WF_RoutineReady.cpp" />
+    <ClCompile Include="Qt_WC_AddProcDialog.cpp" />
+    <ClCompile Include="Qt_WC_RoutineOk.cpp" />
+    <ClCompile Include="Qt_WC_RoutineReady.cpp" />
     <QtRcc Include="Qt_Widgets_App_RoutineAutomator.qrc" />
+    <QtUic Include="Qt_WC_AddProcDialog.ui" />
+    <QtUic Include="Qt_WC_RoutineOk.ui" />
+    <QtUic Include="Qt_WC_RoutineReady.ui" />
     <QtUic Include="Qt_Widgets_App_RoutineAutomator.ui" />
     <QtMoc Include="Qt_Widgets_App_RoutineAutomator.h" />
     <ClCompile Include="Qt_Widgets_App_RoutineAutomator.cpp" />
     <ClCompile Include="main.cpp" />
-    <QtUic Include="WF_RoutineOk.ui" />
-    <QtUic Include="WF_RoutineReady.ui" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Procs.h" />
-    <ClInclude Include="WF_RoutineOk.h" />
-    <ClInclude Include="WF_RoutineReady.h" />
+    <QtMoc Include="Qt_WC_AddProcDialog.h" />
+    <QtMoc Include="Qt_WC_RoutineOk.h" />
+    <QtMoc Include="Qt_WC_RoutineReady.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

@@ -2,6 +2,7 @@
 
 
 #include "ui_Qt_Widgets_App_RoutineAutomator.h"
+#include "Procs.h"
 #include <QtWidgets/QMainWindow>
 #include <iostream>
 
@@ -15,6 +16,10 @@ public:
 
 private:
     Ui::Qt_Widgets_App_RoutineAutomatorClass ui;
+
+
+    QList<Procs> procs; // C++ 에서는 이렇게 선언하는 것이 일반적임.
+    //QList<Procs> procs = QList<Procs>(); // 이 방식도 사용해도 문제는 없지만, 프로그램 시작 시 불필요하게 메모리 영역을 잡아먹기도 함. ( C# 스타일 )
 
 private slots:  // 이벤트 발생 시 실행할 함수 선언 구역
 

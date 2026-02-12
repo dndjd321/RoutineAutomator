@@ -4,7 +4,8 @@
 
 struct ProcInfo {
 	QString name = "";	// 명칭
-	QString dir = "";	// 경로 또는 URL
+	QString dir = "";	// 경로
+	QString url = "";	// URL
 };
 
 struct Procs {

@@ -1,5 +1,6 @@
 ﻿#include "Qt_Widgets_App_RoutineAutomator.h"
 #include "Procs.h"  // 프로세스 내용 정의 헤더 파일
+#include "Qt_WC_AddProcDialog.h";
 #include <QScreen>;
 #include <QGuiApplication>
 
@@ -7,19 +8,20 @@
 // 프로세스 내용 선언
 Procs proc;
 
-// QTreeWidget Item 추가 후 가운데 정렬하는 함수 선언
-void SetTextAlignCenter(QTreeWidget* qtw);
 
-// QTreeWidget Item 추가 후 가운데 정렬하는 함수 정의
-void SetTextAlignCenter(QTreeWidget* qtw) {
-    //if (!item) { return; }   // item이 NULL 일 경우를 방지
-
-    QTreeWidgetItem* item = new QTreeWidgetItem(qtw);
-
-    for (int i = 0; i < qtw->columnCount(); i++) {
-        item->setTextAlignment(i, Qt::AlignCenter);
-    }
-}
+//// QTreeWidget Item 추가 후 가운데 정렬하는 함수 선언
+//void SetTextAlignCenter(QTreeWidget* qtw);
+//
+//// QTreeWidget Item 추가 후 가운데 정렬하는 함수 정의
+//void SetTextAlignCenter(QTreeWidget* qtw) {
+//    //if (!item) { return; }   // item이 NULL 일 경우를 방지
+//
+//    QTreeWidgetItem* item = new QTreeWidgetItem(qtw);
+//
+//    for (int i = 0; i < qtw->columnCount(); i++) {
+//        item->setTextAlignment(i, Qt::AlignCenter);
+//    }
+//}
 
 Qt_Widgets_App_RoutineAutomator::Qt_Widgets_App_RoutineAutomator(QWidget *parent)
     : QMainWindow(parent)
@@ -94,23 +96,35 @@ Qt_Widgets_App_RoutineAutomator::~Qt_Widgets_App_RoutineAutomator()
 
 // 프로세스 추가 함수 로직
 void Qt_Widgets_App_RoutineAutomator::onAddProcClickFunc() {
-    proc.num = 1;
-    proc.delay = 1;
-    proc.dup = true;
-    proc.type = "WEB";
-    proc.info.name = "카톡";
-    proc.info.dir = "내 PC";
+    
+    // Qt_WC_AddProcDialog 화면 띄우기를 위한 생성자 선언
+    Qt_WC_AddProcDialog add_dialog(this);
 
-    QTreeWidgetItem* tree_Item = new QTreeWidgetItem(ui.tw_procList);
-    tree_Item->setData(0, Qt::DisplayRole, proc.num);
-    tree_Item->setData(1, Qt::DisplayRole, proc.type);
-    tree_Item->setData(2, Qt::DisplayRole, proc.info.name + " / " + proc.info.dir);
-    tree_Item->setData(3, Qt::DisplayRole, proc.delay);
-    tree_Item->setCheckState(4, proc.dup ? Qt::Checked : Qt::Unchecked);
- 
-    ui.tw_procList->addTopLevelItem(tree_Item);
+    // 호출
+    if (add_dialog.exec() == QDialog::Accepted) {
+        // 임시 - 나중에 이 부분은 제거 예정
+        proc.num = 1;
+        proc.delay = 1;
+        proc.dup = true;
+        proc.type = "WEB";
+        proc.info.name = "카톡";
+        proc.info.dir = "내 PC";
 
-    SetTextAlignCenter(ui.tw_procList);
+        // 저장된 내용 들고오기
+        Procs procdata = add_dialog.getProcsData();
+
+
+        QTreeWidgetItem* tree_Item = new QTreeWidgetItem(ui.tw_procList);
+        tree_Item->setData(0, Qt::DisplayRole, proc.num);
+        tree_Item->setData(1, Qt::DisplayRole, proc.type);
+        tree_Item->setData(2, Qt::DisplayRole, proc.info.name + " / " + proc.info.dir);
+        tree_Item->setData(3, Qt::DisplayRole, proc.delay);
+        tree_Item->setCheckState(4, proc.dup ? Qt::Checked : Qt::Unchecked);
+
+        ui.tw_procList->addTopLevelItem(tree_Item);
+    }
+
+    //SetTextAlignCenter(ui.tw_procList);
 
 }
 

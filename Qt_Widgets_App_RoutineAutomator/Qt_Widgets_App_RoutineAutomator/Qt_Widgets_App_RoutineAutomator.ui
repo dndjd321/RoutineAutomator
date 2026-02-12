@@ -16,6 +16,9 @@
     <bold>true</bold>
    </font>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::FocusPolicy::ClickFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>RoutineAutomator</string>
   </property>
@@ -35,8 +38,43 @@
       <bold>true</bold>
      </font>
     </property>
+    <property name="mouseTracking">
+     <bool>true</bool>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::FocusPolicy::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton{
+	border:1px solid #000000;
+	background-color : #ffffff;
+}
+
+QPushButton:hover{
+	border:1px solid #000000;
+	background-color : #f0f0f0;
+}
+
+QPushButton:pressed{
+	border:1px solid #060606;
+	background-color : #f4f4f4;
+}
+</string>
+    </property>
     <property name="text">
      <string>+ 추가</string>
+    </property>
+    <property name="checkable">
+     <bool>false</bool>
+    </property>
+    <property name="autoDefault">
+     <bool>false</bool>
+    </property>
+    <property name="default">
+     <bool>false</bool>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QPushButton" name="pbtn_delProc">
@@ -53,6 +91,23 @@
       <pointsize>15</pointsize>
       <bold>true</bold>
      </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton{
+	border:1px solid #000000;
+	background-color : #ffffff;
+}
+
+QPushButton:hover{
+	border:1px solid #000000;
+	background-color : #f0f0f0;
+}
+
+QPushButton:pressed{
+	border:1px solid #060606;
+	background-color : #f4f4f4;
+}
+</string>
     </property>
     <property name="text">
      <string>- 삭제</string>
@@ -73,6 +128,23 @@
       <bold>true</bold>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton{
+	border:1px solid #000000;
+	background-color : #ffffff;
+}
+
+QPushButton:hover{
+	border:1px solid #000000;
+	background-color : #f0f0f0;
+}
+
+QPushButton:pressed{
+	border:1px solid #060606;
+	background-color : #f4f4f4;
+}
+</string>
+    </property>
     <property name="text">
      <string>↑ 위로 이동</string>
     </property>
@@ -92,6 +164,23 @@
       <bold>true</bold>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton{
+	border:1px solid #000000;
+	background-color : #ffffff;
+}
+
+QPushButton:hover{
+	border:1px solid #000000;
+	background-color : #f0f0f0;
+}
+
+QPushButton:pressed{
+	border:1px solid #060606;
+	background-color : #f4f4f4;
+}
+</string>
+    </property>
     <property name="text">
      <string>↓아래로 이동</string>
     </property>
@@ -110,6 +199,23 @@
       <pointsize>15</pointsize>
       <bold>true</bold>
      </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton{
+	border:1px solid #000000;
+	background-color : #ffffff;
+}
+
+QPushButton:hover{
+	border:1px solid #000000;
+	background-color : #f0f0f0;
+}
+
+QPushButton:pressed{
+	border:1px solid #060606;
+	background-color : #f4f4f4;
+}
+</string>
     </property>
     <property name="text">
      <string>▶ 실행</string>
