@@ -89,6 +89,10 @@ Qt_Widgets_App_RoutineAutomator::Qt_Widgets_App_RoutineAutomator(QWidget *parent
     #pragma endregion
 
     
+    // json 파일 경로 저장 및 내용 읽어오기
+    j_FilePath = QCoreApplication::applicationDirPath() + "/routine_config.json";
+    procs = JsonDataManager::loadFile(j_FilePath);
+
 
 
 }
@@ -119,15 +123,12 @@ void Qt_Widgets_App_RoutineAutomator::onAddProcClickFunc() {
 
         ui.tw_procList->addTopLevelItem(tree_Item);
 
-        // treeWidget에 있는 모든 데이터를 QList<Procs>에 수집
-        QList<Procs> allData;
-        for (int i = 0; i < ui.tw_procList->topLevelItemCount(); ++i) {
+        // 1. procs 메모리에 proc 추가
+        // 전체 데이터 포함된 QList<procs>에 방금 추가한 proc 내용 추가하기
+        procs.append(proc);
 
-        }
-
-
-        // ui.tw_procList에 있는 item들 정보 들고와서 로컬에 파일로 저장하기 ( json? )
-        
+        // 2. 파일에 전체 저장
+        JsonDataManager::saveFile(j_FilePath, procs);
 
 
     }

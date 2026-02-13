@@ -28,3 +28,32 @@ bool JsonDataManager::saveFile(const QString& filePath, const QList<Procs>& data
 	q_file.close();
 	return true;
 }
+
+QList<Procs> loadFile(QString& filePath) {
+	QList<Procs> qlist_proc;
+	QFile q_file(filePath);
+
+	// 1. 파일이 있는지 체크
+	if (!q_file.exists()) {	// 파일이 존재하지 않을 경우
+		qDebug() << "파일이 존재하지 않습니다. :: " << filePath;
+		return qlist_proc;	// 비어있는 QList 반환
+	}
+
+	if (!q_file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		qDebug() << "파일을 열거나 읽어오는데 실패하였습니다.";
+		return qlist_proc;	// 비어있는 QList 반환
+	}
+
+
+
+	// json 파일 읽어오기
+
+
+	// 읽어온 데이터 반복문으로 하나의 proc씩 값 담기
+
+
+	
+
+
+	return qlist_proc;
+}

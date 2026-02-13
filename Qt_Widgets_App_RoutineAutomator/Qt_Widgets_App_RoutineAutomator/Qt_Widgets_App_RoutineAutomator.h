@@ -17,9 +17,10 @@ public:
 private:
     Ui::Qt_Widgets_App_RoutineAutomatorClass ui;
 
-
-    QList<Procs> procs; // C++ 에서 일반적으로 선언하는 방식
     //QList<Procs> procs = QList<Procs>(); //  C# 방식 
+    QList<Procs> procs; // C++ 에서 일반적으로 선언하는 방식
+    QString j_FilePath;  // json 파일 저장 경로
+    
 
 private slots:  // UI 이벤트 처리 함수
 
