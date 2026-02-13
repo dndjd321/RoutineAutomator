@@ -316,7 +316,7 @@ QPushButton:pressed{
      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
     </property>
     <property name="columnCount">
-     <number>5</number>
+     <number>6</number>
     </property>
     <attribute name="headerCascadingSectionResizes">
      <bool>true</bool>
@@ -340,6 +340,14 @@ QPushButton:pressed{
     <column>
      <property name="text">
       <string>이름 / 경로</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>URL</string>
      </property>
      <property name="textAlignment">
       <set>AlignCenter</set>

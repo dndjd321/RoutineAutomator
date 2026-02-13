@@ -10,7 +10,6 @@ Qt_WC_AddProcDialog::Qt_WC_AddProcDialog(QWidget *parent)
 {
 	ui.setupUi(this);
 
-
 	// 연결 공식: connect(신호보낼객체, 신호종류, 받는객체, 실행할함수);
 	// 예시 : connect(ui.pbtn_addProc, &QPushButton::clicked, this, &Qt_Widgets_App_RoutineAutomator::onAddProcClicked);
 	
@@ -35,6 +34,11 @@ Qt_WC_AddProcDialog::Qt_WC_AddProcDialog(QWidget *parent)
 	connect(ui.pbtn_AddProcCancle, &QPushButton::clicked, this, &Qt_WC_AddProcDialog::AddProcCancleFunc);
 
 
+	// readOnly와 유사한 기능 구현을 위해 추가 -> 사용자가 해당 RadioButton을 마우스 클릭해도 동작하지 않도록 설정
+	ui.rb_chkApp->setAttribute(Qt::WA_TransparentForMouseEvents);
+	ui.rb_chkWeb->setAttribute(Qt::WA_TransparentForMouseEvents);
+
+
 }
 
 Qt_WC_AddProcDialog::~Qt_WC_AddProcDialog()
@@ -43,11 +47,6 @@ Qt_WC_AddProcDialog::~Qt_WC_AddProcDialog()
 
 
 void Qt_WC_AddProcDialog::SearchProcsFunc() {
-	/*QFileDialog qfd;
-
-	qfd.open();
-
-	qfd.close();*/
 
 	QString filePath = QFileDialog::getOpenFileName(
 		this,								// 부모 위젯
@@ -65,11 +64,15 @@ void Qt_WC_AddProcDialog::SearchProcsFunc() {
 
 		if (fileName.contains("chrome") || fileName.contains("firefox") || fileName.contains("opera") || fileName.contains("explorer")) {
 			//ui.rb_chkWeb->QRadioButton::isChecked();
-			CheckChangeTypeFunc(ui.rb_chkWeb);
+			//CheckChangeTypeFunc(ui.rb_chkWeb);
+			ui.rb_chkWeb->QRadioButton::setChecked(true);
+			ui.le_url->QLineEdit::setEnabled(true);
 		}
 		else{
 			//ui.rb_chkApp->QRadioButton::isChecked();
-			CheckChangeTypeFunc(ui.rb_chkApp);
+			//CheckChangeTypeFunc(ui.rb_chkApp);
+			ui.rb_chkApp->QRadioButton::setChecked(true);
+			ui.le_url->QLineEdit::setEnabled(false);
 		}
 	}
 

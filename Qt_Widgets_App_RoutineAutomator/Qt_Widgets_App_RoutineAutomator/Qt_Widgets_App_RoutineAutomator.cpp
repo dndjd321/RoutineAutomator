@@ -1,9 +1,9 @@
 ﻿#include "Qt_Widgets_App_RoutineAutomator.h"
 #include "Procs.h"  // 프로세스 내용 정의 헤더 파일
-#include "Qt_WC_AddProcDialog.h";
-#include <QScreen>;
+#include "Qt_WC_AddProcDialog.h"
+#include <QScreen>
 #include <QGuiApplication>
-
+#include "jsonDataManager.h"
 
 // 프로세스 내용 선언
 Procs proc;
@@ -52,20 +52,20 @@ Qt_Widgets_App_RoutineAutomator::Qt_Widgets_App_RoutineAutomator(QWidget *parent
 
     #pragma region QTreeWidget Column Width Setting
     // QTreeWidget Column Width Setting
-    ui.tw_procList->setColumnWidth(0, 75);
-    ui.tw_procList->setColumnWidth(1, 75);
-    ui.tw_procList->setColumnWidth(2, 370);
-    ui.tw_procList->setColumnWidth(3, 75);
+    ui.tw_procList->setColumnWidth(0, 60);
+    ui.tw_procList->setColumnWidth(1, 60);
+    ui.tw_procList->setColumnWidth(2, 205);
+    ui.tw_procList->setColumnWidth(3, 205);
+    ui.tw_procList->setColumnWidth(4, 60);
     #pragma endregion
 
-
-    
+    #pragma region ui와 함수 연결
     // 연결 공식: connect(신호보낼객체, 신호종류, 받는객체, 실행할함수);
     // 예시 : connect(ui.pbtn_addProc, &QPushButton::clicked, this, &Qt_Widgets_App_RoutineAutomator::onAddProcClicked);
 
     // 프로세스 추가 함수 연결
     connect(ui.pbtn_addProc, &QPushButton::clicked, this, &Qt_Widgets_App_RoutineAutomator::onAddProcClickFunc);
-    
+
     // 프로세스 제거 함수 연결
     connect(ui.pbtn_delProc, &QPushButton::clicked, this, &Qt_Widgets_App_RoutineAutomator::onRemoveProcClickFunc);
 
@@ -79,13 +79,16 @@ Qt_Widgets_App_RoutineAutomator::Qt_Widgets_App_RoutineAutomator(QWidget *parent
     connect(ui.pbtn_runProc, &QPushButton::clicked, this, &Qt_Widgets_App_RoutineAutomator::onRunProcClickFunc);
 
     // 윈도우 시작 시 프로그램 자동 실행 체크박스 설정 함수 연결
-    connect(ui.cb_autoStart, &QCheckBox::checkStateChanged, this, &Qt_Widgets_App_RoutineAutomator::onStatusChangeFunc );
+    connect(ui.cb_autoStart, &QCheckBox::checkStateChanged, this, &Qt_Widgets_App_RoutineAutomator::onStatusChangeFunc);
 
     // 트레이 아이콘으로 실행 유지 설정 함수 연결
     connect(ui.cb_trayIcon, &QCheckBox::checkStateChanged, this, &Qt_Widgets_App_RoutineAutomator::onTrayIconCheckFunc);
 
     // 현재 진행 상황 label 설정 함수 연결
     connect(ui.lb_status, &QLabel::setText, this, &Qt_Widgets_App_RoutineAutomator::onStatusChangeFunc);
+    #pragma endregion
+
+    
 
 
 }
@@ -110,10 +113,23 @@ void Qt_Widgets_App_RoutineAutomator::onAddProcClickFunc() {
         tree_Item->setData(0, Qt::DisplayRole, ui.tw_procList->topLevelItemCount());
         tree_Item->setData(1, Qt::DisplayRole, proc.type);
         tree_Item->setData(2, Qt::DisplayRole, proc.info.name + " / " + proc.info.dir);
-        tree_Item->setData(3, Qt::DisplayRole, proc.delay);
-        tree_Item->setCheckState(4, proc.dup ? Qt::Checked : Qt::Unchecked);
+        tree_Item->setData(3, Qt::DisplayRole, proc.info.url);
+        tree_Item->setData(4, Qt::DisplayRole, proc.delay);
+        tree_Item->setCheckState(5, proc.dup ? Qt::Checked : Qt::Unchecked);
 
         ui.tw_procList->addTopLevelItem(tree_Item);
+
+        // treeWidget에 있는 모든 데이터를 QList<Procs>에 수집
+        QList<Procs> allData;
+        for (int i = 0; i < ui.tw_procList->topLevelItemCount(); ++i) {
+
+        }
+
+
+        // ui.tw_procList에 있는 item들 정보 들고와서 로컬에 파일로 저장하기 ( json? )
+        
+
+
     }
 
     //SetTextAlignCenter(ui.tw_procList);
