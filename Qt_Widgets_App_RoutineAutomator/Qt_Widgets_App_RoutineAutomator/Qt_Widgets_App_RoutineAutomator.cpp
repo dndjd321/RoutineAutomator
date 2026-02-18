@@ -1,9 +1,16 @@
 ﻿#include "Qt_Widgets_App_RoutineAutomator.h"
-#include "Procs.h"  // 프로세스 내용 정의 헤더 파일
 #include "Qt_WC_AddProcDialog.h"
-#include <QScreen>
-#include <QGuiApplication>
+#include "Qt_WC_RoutineOk.h"
 #include "jsonDataManager.h"
+#include <qscreen.h>
+#include <qguiapplication.h>
+#include <qmessagebox.h>
+#include <qdesktopservices.h>
+#include <qtimer.h>
+#include <qprocess.h>
+#include <qsettings.h>
+#include <qdir.h>
+
 
 // 프로세스 내용 선언
 Procs proc;
@@ -87,11 +94,47 @@ Qt_Widgets_App_RoutineAutomator::Qt_Widgets_App_RoutineAutomator(QWidget *parent
     // 현재 진행 상황 label 설정 함수 연결
     connect(ui.lb_status, &QLabel::setText, this, &Qt_Widgets_App_RoutineAutomator::onStatusChangeFunc);
     #pragma endregion
-
     
+    #pragma region Json 데이터 불러오기
     // json 파일 경로 저장 및 내용 읽어오기
     j_FilePath = QCoreApplication::applicationDirPath() + "/routine_config.json";
     procs = JsonDataManager::loadFile(j_FilePath);
+
+    for (auto& proc : procs) {
+        addTreeItem(proc);
+    }
+    #pragma endregion
+
+    #pragma region 프로그램 자동 실행 설정
+    // 프로그램 시작 시 현재 레지스트리 상태를 읽어와서 체크박스에 반영
+    QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+    if (settings.contains("RoutineAutomator")) {
+        ui.cb_autoStart->setChecked(true);
+    }
+
+    // 3. 트레이 아이콘 및 메뉴 설정
+    trayIcon = new QSystemTrayIcon(this);
+    // 아이콘이 없다면 기본 시스템 아이콘으로 대체 가능
+    trayIcon->setIcon(style()->standardIcon(QStyle::SP_ComputerIcon));
+    trayIcon->setToolTip("루틴 자동화 도구");
+
+    trayMenu = new QMenu(this);
+    trayMenu->addAction("열기", this, &QWidget::showNormal);
+    trayMenu->addAction("종료", qApp, &QCoreApplication::quit);
+    trayIcon->setContextMenu(trayMenu);
+    trayIcon->show();
+
+    // 프로그램 실행 시 들어온 인자 리스트 확인
+    QStringList args = QCoreApplication::arguments();
+
+    if (args.contains("-auto")) {
+        qDebug() << "윈도우 자동 실행으로 시작됨. 루틴을 즉시 실행합니다.";
+        this->hide(); // 트레이로 숨기기
+        // UI가 완전히 뜨기 전일 수 있으므로 약간의 여유를 두고 시작하거나 즉시 호출
+        QTimer::singleShot(1000, this, &Qt_Widgets_App_RoutineAutomator::startRoutine);
+    }
+    #pragma endregion
+
 
 
 
@@ -100,6 +143,98 @@ Qt_Widgets_App_RoutineAutomator::Qt_Widgets_App_RoutineAutomator(QWidget *parent
 Qt_Widgets_App_RoutineAutomator::~Qt_Widgets_App_RoutineAutomator()
 {}
 
+// QTreeWidget Item 추가 함수 정의
+void Qt_Widgets_App_RoutineAutomator::addTreeItem(Procs& p) {
+    QTreeWidgetItem* tree_Item = new QTreeWidgetItem(ui.tw_procList);
+    p.num = ui.tw_procList->topLevelItemCount();
+    tree_Item->setData(0, Qt::DisplayRole, p.num);
+    tree_Item->setData(1, Qt::DisplayRole, p.type);
+    tree_Item->setData(2, Qt::DisplayRole, p.info.name + " / " + p.info.dir);
+    tree_Item->setData(3, Qt::DisplayRole, p.info.url);
+    tree_Item->setData(4, Qt::DisplayRole, p.delay);
+    tree_Item->setCheckState(5, p.dup ? Qt::Checked : Qt::Unchecked);
+
+    ui.tw_procList->addTopLevelItem(tree_Item);
+}
+
+// QTreeWidget Item 순서 재정렬 함수 정의
+void Qt_Widgets_App_RoutineAutomator::reOrderTreeItems() {
+    int count = ui.tw_procList->topLevelItemCount();
+
+    // ++i 국룰을 사용하여 모든 아이템의 0번 컬럼(순번)을 갱신합니다.
+    for (int i = 0; i < count; ++i) {
+        QTreeWidgetItem* item = ui.tw_procList->topLevelItem(i);
+
+        // UI상의 번호를 다시 세팅 (1번부터 시작할 경우 i + 1)
+        item->setData(0, Qt::DisplayRole, i + 1);
+
+        // 메모리 리스트의 num 값도 동기화하고 싶다면 여기서 수정합니다.
+        if (i < procs.size()) {
+            procs[i].num = i + 1;
+        }
+    }
+}
+
+// 프로세스 실행 함수 로직
+void Qt_Widgets_App_RoutineAutomator::startRoutine() {
+    if (procs.isEmpty()) {
+        QMessageBox::information(this, "알림", "실행할 프로세스가 없습니다.");
+        return;
+    }
+
+    currentExecIdx = 0; // 0번(1번째)부터 시작
+
+    ui.tw_procList->setCurrentItem(ui.tw_procList->topLevelItem(currentExecIdx));
+    executeNextProcess();
+}
+
+// 다음 프로세스 실행 함수 로직
+void Qt_Widgets_App_RoutineAutomator::executeNextProcess() {
+    // 1. 모든 프로세스 실행 완료 체크
+    if (currentExecIdx >= procs.size()) {
+        // 마지막 프로세스까지 완료되면 완료창 띄우기 (Logic 3)
+        Qt_WC_RoutineOk* okDialog = new Qt_WC_RoutineOk(this);
+        okDialog->setAttribute(Qt::WA_DeleteOnClose); // 닫히면 메모리 해제
+        okDialog->show();
+        return;
+    }
+
+    // 2. 현재 실행할 프로세스 정보 가져오기
+    const Procs& proc = procs[currentExecIdx];
+
+    // 3. 프로세스 실제 실행
+    // 예: 외부 프로그램 실행(QProcess) 또는 웹 URL 열기 등
+    if (proc.type == "WEB") {
+        QDesktopServices::openUrl(QUrl(proc.info.url));
+    }
+    else {
+        QString programPath = proc.info.dir; // 저장된 파일 경로
+
+        if (!programPath.isEmpty()) {
+            // 1. 실행할 파일이 실제로 존재하는지 체크
+            if (QFile::exists(programPath)) {
+                // 2. 프로그램 실행 (관리자 권한 계승)
+                bool success = QProcess::startDetached(programPath, QStringList() << "/s");
+
+                if (!success) {
+                    qDebug() << "프로그램 실행 실패:" << programPath;
+                }
+            }
+            else {
+                qDebug() << "파일을 찾을 수 없습니다:" << programPath;
+            }
+        }
+    }
+
+    qDebug() << currentExecIdx + 1 << "번 프로세스 실행 중...";
+
+    // 4. 딜레이 대기 후 다음 프로세스 진행 (Logic 2)
+    int delayMs = proc.delay * 1000; // 초 단위를 밀리초로 변환
+    currentExecIdx++; // 다음 인덱스로 증가
+
+    // 비동기 대기: UI가 멈추지 않으면서 지정된 시간 뒤에 다음 함수 호출
+    QTimer::singleShot(delayMs, this, &Qt_Widgets_App_RoutineAutomator::executeNextProcess);
+}
 
 // 프로세스 추가 함수 로직
 void Qt_Widgets_App_RoutineAutomator::onAddProcClickFunc() {
@@ -113,53 +248,128 @@ void Qt_Widgets_App_RoutineAutomator::onAddProcClickFunc() {
         // 저장된 내용 들고오기
         Procs proc = add_dialog.getProc();
 
-        QTreeWidgetItem* tree_Item = new QTreeWidgetItem(ui.tw_procList);
-        tree_Item->setData(0, Qt::DisplayRole, ui.tw_procList->topLevelItemCount());
-        tree_Item->setData(1, Qt::DisplayRole, proc.type);
-        tree_Item->setData(2, Qt::DisplayRole, proc.info.name + " / " + proc.info.dir);
-        tree_Item->setData(3, Qt::DisplayRole, proc.info.url);
-        tree_Item->setData(4, Qt::DisplayRole, proc.delay);
-        tree_Item->setCheckState(5, proc.dup ? Qt::Checked : Qt::Unchecked);
-
-        ui.tw_procList->addTopLevelItem(tree_Item);
-
         // 1. procs 메모리에 proc 추가
+        addTreeItem(proc);
+
         // 전체 데이터 포함된 QList<procs>에 방금 추가한 proc 내용 추가하기
         procs.append(proc);
 
         // 2. 파일에 전체 저장
         JsonDataManager::saveFile(j_FilePath, procs);
 
-
     }
-
-    //SetTextAlignCenter(ui.tw_procList);
-
 }
 
 // 프로세스 제거 함수 로직
 void Qt_Widgets_App_RoutineAutomator::onRemoveProcClickFunc() {
+    // 1. 현재 선택된 아이템 가져오기
+    QTreeWidgetItem* currentItem = ui.tw_procList->currentItem();
 
+    if (!currentItem) {
+        QMessageBox::warning(this, "삭제 오류", "삭제할 항목을 먼저 선택해주세요.");
+        return;
+    }
+
+    // 선택된 항목의 인덱스 확인 (0부터 시작)
+    int index = ui.tw_procList->indexOfTopLevelItem(currentItem);
+
+    // 2. 메모리 리스트(m_routineList)에서 제거
+    if (index >= 0 && index < procs.size()) {
+        procs.removeAt(index); // 특정 위치의 데이터 삭제
+    }
+
+    // 3. UI(QTreeWidget)에서 제거
+    delete currentItem;
+
+    // 4. 제거 후 순번 다시 정렬 (Logic 2)
+    reOrderTreeItems();
+
+    // 5. JSON 데이터 업데이트 (Logic 3)
+    // 리스트 전체를 다시 저장하여 파일 내용을 최신화합니다.
+    if (JsonDataManager::saveFile(j_FilePath, procs)) {
+        qDebug() << "삭제 후 JSON 업데이트 완료";
+    }
 }
 
 // 프로세스 순서 위로 이동하는 함수 로직
 void Qt_Widgets_App_RoutineAutomator::onMoveUpProcClickFunc() {
+    QTreeWidgetItem* currentItem = ui.tw_procList->currentItem();
+    if (!currentItem) return;
 
+    int index = ui.tw_procList->indexOfTopLevelItem(currentItem);
+
+    // 가장 위(0번)가 아니어야 위로 올릴 수 있음
+    if (index > 0) {
+        // 1. 메모리 리스트 순서 교체 (index-1 과 index 교체)
+        procs.swapItemsAt(index, index - 1);
+
+        // 2. UI 순서 교체
+        // 현재 아이템을 잠시 떼어냈다가 위 칸에 다시 끼워 넣음
+        ui.tw_procList->takeTopLevelItem(index);
+        ui.tw_procList->insertTopLevelItem(index - 1, currentItem);
+
+        // 3. 포커스 유지
+        ui.tw_procList->setCurrentItem(currentItem);
+
+        // 4. 번호 재정렬 및 JSON 저장
+        reOrderTreeItems();
+        JsonDataManager::saveFile(j_FilePath, procs);
+    }
 }
 
 // 프로세스 순서 아래로 이동하는 함수 로직
 void Qt_Widgets_App_RoutineAutomator::onMoveDownProcClickFunc() {
+    QTreeWidgetItem* currentItem = ui.tw_procList->currentItem();
+    if (!currentItem) return;
 
+    int index = ui.tw_procList->indexOfTopLevelItem(currentItem);
+    int lastIndex = ui.tw_procList->topLevelItemCount() - 1;
+
+    // 가장 아래가 아니어야 아래로 내릴 수 있음
+    if (index < lastIndex) {
+        // 1. 메모리 리스트 순서 교체 (index 와 index+1 교체)
+        procs.swapItemsAt(index, index + 1);
+
+        // 2. UI 순서 교체
+        ui.tw_procList->takeTopLevelItem(index);
+        ui.tw_procList->insertTopLevelItem(index + 1, currentItem);
+
+        // 3. 포커스 유지
+        ui.tw_procList->setCurrentItem(currentItem);
+
+        // 4. 번호 재정렬 및 JSON 저장
+        reOrderTreeItems();
+        JsonDataManager::saveFile(j_FilePath , procs);
+    }
 }
 
 // 프로세스 실행 함수 로직
 void Qt_Widgets_App_RoutineAutomator::onRunProcClickFunc() {
-
+    startRoutine();
 }
 
 // 윈도우 시작 시 자동 실행 설정 함수 로직
-void Qt_Widgets_App_RoutineAutomator::onAutoStartCheckFunc() {
+void Qt_Widgets_App_RoutineAutomator::onAutoStartCheckFunc(int state) {
+    // 윈도우 레지스트리 시작 프로그램 경로
+    QString regPath = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run";
+    QSettings settings(regPath, QSettings::NativeFormat);
 
+    // 프로그램 이름 (레지스트리에 표시될 키 이름)
+    QString appName = "RoutineAutomator";
+    // 현재 실행 파일의 전체 경로
+    QString appPath = QDir::toNativeSeparators(QCoreApplication::applicationFilePath());
+    QString autoRunPath = QString("\"%1\" -auto").arg(appPath);
+
+    if (state == Qt::Checked) {
+        // 1. 체크됨 -> 레지스트리에 등록
+        settings.setValue(appName, autoRunPath);
+        //qDebug() << "자동 실행 등록 완료:" << appPath;
+    }
+    else {
+        // 2. 체크 해제됨 -> 레지스트리에서 삭제
+        settings.remove(appName);
+        //qDebug() << "자동 실행 해제 완료";
+    }
 }
 
 // 트레리 아이콘 설정 함수 로직

@@ -29,7 +29,7 @@ bool JsonDataManager::saveFile(const QString& filePath, const QList<Procs>& data
 	return true;
 }
 
-QList<Procs> loadFile(QString& filePath) {
+QList<Procs> JsonDataManager::loadFile(const QString& filePath) {
 	QList<Procs> qlist_proc;
 	QFile q_file(filePath);
 
@@ -44,16 +44,38 @@ QList<Procs> loadFile(QString& filePath) {
 		return qlist_proc;	// 비어있는 QList 반환
 	}
 
-
-
 	// json 파일 읽어오기
+	QByteArray jsonData = q_file.readAll();
+	// 읽은 후 파일 close
+	q_file.close();
 
+	// json 데이터 문서로 파싱하기
+	QJsonDocument qj_doc = QJsonDocument::fromJson(jsonData);
+	if (qj_doc.isNull() || !qj_doc.isArray()) {
+		qDebug() << "Json 형식에 맞지 않습니다.";
+		return qlist_proc;
+	}
+
+	// 읽어온 내용 QJsonArray에 담기
+	QJsonArray j_array = qj_doc.array();
 
 	// 읽어온 데이터 반복문으로 하나의 proc씩 값 담기
+	// 4. JSON 배열을 QList<Procs>로 변환 (++i 국룰 사용!)
+	for (int i = 0; i < j_array.size(); ++i) {
+		QJsonObject obj = j_array[i].toObject();
+		Procs p;
 
+		// JSON 키값은 saveFile에서 썼던 명칭과 정확히 일치해야 합니다.
+		p.num = obj["num"].toInt();
+		p.type = obj["type"].toString();
+		p.info.name = obj["name"].toString();
+		p.info.dir = obj["dir"].toString();
+		p.info.url = obj["url"].toString();
+		p.delay = obj["delay"].toInt();
+		p.dup = obj["dup"].toBool();
 
-	
-
+		qlist_proc.append(p);
+	}
 
 	return qlist_proc;
 }

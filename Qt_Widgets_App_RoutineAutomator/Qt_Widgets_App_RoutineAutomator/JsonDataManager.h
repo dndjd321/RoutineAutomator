@@ -18,5 +18,5 @@ public:
 	// 파일 로드 함수
 	static QList<Procs> loadFile(const QString& filePath);
 
-
+	
 };
