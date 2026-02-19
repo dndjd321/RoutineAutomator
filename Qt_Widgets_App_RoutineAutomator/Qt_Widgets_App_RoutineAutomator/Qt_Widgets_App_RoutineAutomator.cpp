@@ -214,7 +214,7 @@ void Qt_Widgets_App_RoutineAutomator::executeNextProcess() {
             // 1. 실행할 파일이 실제로 존재하는지 체크
             if (QFile::exists(programPath)) {
                 // 2. 프로그램 실행 (관리자 권한 계승)
-                bool success = QProcess::startDetached(programPath, QStringList() << "/s");
+                bool success = QProcess::startDetached(programPath, QStringList());
 
                 if (!success) {
                     qDebug() << "프로그램 실행 실패:" << programPath;
