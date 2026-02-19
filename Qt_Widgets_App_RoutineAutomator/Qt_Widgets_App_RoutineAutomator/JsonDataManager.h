@@ -6,6 +6,8 @@
 #include <qjsonobject.h>
 #include <qfile.h>
 #include "Procs.h"
+#include "Settings.h"
+
 
 class JsonDataManager {
 public:
@@ -18,5 +20,7 @@ public:
 	// 파일 로드 함수
 	static QList<Procs> loadFile(const QString& filePath);
 
-	
+	static void saveSettings(const QString& filePath, const Settings& settings);
+
+	static Settings loadSettings(const QString& filePath);
 };

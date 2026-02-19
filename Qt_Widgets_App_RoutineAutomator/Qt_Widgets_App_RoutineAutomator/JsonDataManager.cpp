@@ -79,3 +79,36 @@ QList<Procs> JsonDataManager::loadFile(const QString& filePath) {
 
 	return qlist_proc;
 }
+
+void JsonDataManager::saveSettings(const QString& filePath, const Settings& settings) {
+	QJsonObject qj_obj;
+	qj_obj["autoStart"] = settings.autoStart;
+	qj_obj["uesTray"] = settings.useTray;
+
+	QJsonDocument qj_doc(qj_obj);
+	QFile q_file(filePath);
+
+	if (q_file.open(QIODevice::WriteOnly)) {
+		q_file.write(qj_doc.toJson());
+		q_file.close();
+	}
+}
+
+Settings JsonDataManager::loadSettings(const QString& filePath) {
+	Settings settings;
+	QFile q_file(filePath);
+
+	// 파일이 없으면 기본 값 return
+	if (!q_file.open(QIODevice::ReadOnly)) {
+		return settings;
+	}
+
+	QByteArray q_array = q_file.readAll();
+	QJsonDocument qj_doc = QJsonDocument::fromJson(q_array);
+	QJsonObject qj_obj = qj_doc.object();
+
+	settings.autoStart = qj_obj["autoStart"].toBool();
+	settings.useTray = qj_obj["useTray"].toBool();
+
+	return settings;
+}

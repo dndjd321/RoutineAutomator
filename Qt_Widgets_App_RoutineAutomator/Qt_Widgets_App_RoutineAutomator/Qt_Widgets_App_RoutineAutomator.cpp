@@ -10,6 +10,7 @@
 #include <qprocess.h>
 #include <qsettings.h>
 #include <qdir.h>
+#include <QCloseEvent>
 
 
 // 프로세스 내용 선언
@@ -35,9 +36,9 @@ Qt_Widgets_App_RoutineAutomator::Qt_Widgets_App_RoutineAutomator(QWidget *parent
 {
     ui.setupUi(this);
 
-    #pragma region 메인 창 크기 고정, 
+    #pragma region 메인 창 크기 고정 
     // 메인 창 크기 고정
-    this->setFixedSize(700, 500);
+    this->setFixedSize(700, 470);
     #pragma endregion
 
     #pragma region 메인 창 닫기, 최소화 활성화. 최대화는 비활성화
@@ -86,50 +87,60 @@ Qt_Widgets_App_RoutineAutomator::Qt_Widgets_App_RoutineAutomator(QWidget *parent
     connect(ui.pbtn_runProc, &QPushButton::clicked, this, &Qt_Widgets_App_RoutineAutomator::onRunProcClickFunc);
 
     // 윈도우 시작 시 프로그램 자동 실행 체크박스 설정 함수 연결
-    connect(ui.cb_autoStart, &QCheckBox::checkStateChanged, this, &Qt_Widgets_App_RoutineAutomator::onStatusChangeFunc);
+    //connect(ui.cb_autoStart, &QCheckBox::checkStateChanged, this, &Qt_Widgets_App_RoutineAutomator::onStatusChangeFunc);
+    connect(ui.cb_autoStart, &QCheckBox::checkStateChanged, this, [this](int state) {
+        onStatusChangeFunc(state == Qt::Checked ? "자동 실행 활성화" : "자동 실행 비활성화");
+        });
 
     // 트레이 아이콘으로 실행 유지 설정 함수 연결
     connect(ui.cb_trayIcon, &QCheckBox::checkStateChanged, this, &Qt_Widgets_App_RoutineAutomator::onTrayIconCheckFunc);
-
-    // 현재 진행 상황 label 설정 함수 연결
-    connect(ui.lb_status, &QLabel::setText, this, &Qt_Widgets_App_RoutineAutomator::onStatusChangeFunc);
+    
     #pragma endregion
     
     #pragma region Json 데이터 불러오기
-    // json 파일 경로 저장 및 내용 읽어오기
+    // json 파일 경로 저장
     j_FilePath = QCoreApplication::applicationDirPath() + "/routine_config.json";
+    // 프로세스 정보 불러오기
     procs = JsonDataManager::loadFile(j_FilePath);
 
+    // 프로세스 정보 추가
     for (auto& proc : procs) {
         addTreeItem(proc);
     }
+
+    // json 파일 경로 저장
+    s_FilePath = QCoreApplication::applicationDirPath() + "/settings.json";
+    // 설정 정보 불러오기
+    Settings currentSettings = JsonDataManager::loadSettings(s_FilePath);
+    // 설정 정보 추가
+    ui.cb_autoStart->setChecked(currentSettings.autoStart);
+    ui.cb_trayIcon->setChecked(currentSettings.useTray);
+
+
     #pragma endregion
 
     #pragma region 프로그램 자동 실행 설정
     // 프로그램 시작 시 현재 레지스트리 상태를 읽어와서 체크박스에 반영
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+    bool useTray = settings.value("UseTray", false).toBool();   // 기본값 false로 설정
+
     if (settings.contains("RoutineAutomator")) {
         ui.cb_autoStart->setChecked(true);
     }
 
-    // 3. 트레이 아이콘 및 메뉴 설정
-    trayIcon = new QSystemTrayIcon(this);
-    // 아이콘이 없다면 기본 시스템 아이콘으로 대체 가능
-    trayIcon->setIcon(style()->standardIcon(QStyle::SP_ComputerIcon));
-    trayIcon->setToolTip("루틴 자동화 도구");
-
-    trayMenu = new QMenu(this);
-    trayMenu->addAction("열기", this, &QWidget::showNormal);
-    trayMenu->addAction("종료", qApp, &QCoreApplication::quit);
-    trayIcon->setContextMenu(trayMenu);
-    trayIcon->show();
+    // useTray 값에 따라 CheckBox 상태 설정
+    ui.cb_trayIcon->setChecked(useTray);
+    
+    
 
     // 프로그램 실행 시 들어온 인자 리스트 확인
     QStringList args = QCoreApplication::arguments();
 
     if (args.contains("-auto")) {
-        qDebug() << "윈도우 자동 실행으로 시작됨. 루틴을 즉시 실행합니다.";
-        this->hide(); // 트레이로 숨기기
+        onStatusChangeFunc("윈도우 자동 실행으로 시작됨. 루틴을 즉시 실행합니다.");
+        if (ui.cb_trayIcon->isChecked()) {
+            this->hide();
+        }
         // UI가 완전히 뜨기 전일 수 있으므로 약간의 여유를 두고 시작하거나 즉시 호출
         QTimer::singleShot(1000, this, &Qt_Widgets_App_RoutineAutomator::startRoutine);
     }
@@ -182,6 +193,13 @@ void Qt_Widgets_App_RoutineAutomator::startRoutine() {
         return;
     }
 
+    // 루틴 시작 시 버튼들을 못 누르게 막음
+    ui.pbtn_runProc->setEnabled(false);
+    ui.pbtn_addProc->setEnabled(false);
+    ui.pbtn_delProc->setEnabled(false);
+    ui.pbtn_upProc->setEnabled(false);
+    ui.pbtn_downProc->setEnabled(false);
+
     currentExecIdx = 0; // 0번(1번째)부터 시작
 
     ui.tw_procList->setCurrentItem(ui.tw_procList->topLevelItem(currentExecIdx));
@@ -196,8 +214,17 @@ void Qt_Widgets_App_RoutineAutomator::executeNextProcess() {
         Qt_WC_RoutineOk* okDialog = new Qt_WC_RoutineOk(this);
         okDialog->setAttribute(Qt::WA_DeleteOnClose); // 닫히면 메모리 해제
         okDialog->show();
+
+        // 루틴 완료 후 버튼 활성화
+        ui.pbtn_runProc->setEnabled(true);
+        ui.pbtn_addProc->setEnabled(true);
+        ui.pbtn_delProc->setEnabled(true);
+        ui.pbtn_upProc->setEnabled(true);
+        ui.pbtn_downProc->setEnabled(true);
         return;
     }
+
+    onStatusChangeFunc((currentExecIdx + 1) + "번 프로세스 실행 중...");
 
     // 2. 현재 실행할 프로세스 정보 가져오기
     const Procs& proc = procs[currentExecIdx];
@@ -217,16 +244,14 @@ void Qt_Widgets_App_RoutineAutomator::executeNextProcess() {
                 bool success = QProcess::startDetached(programPath, QStringList());
 
                 if (!success) {
-                    qDebug() << "프로그램 실행 실패:" << programPath;
+                    onStatusChangeFunc("프로그램 실행 실패:" + programPath);
                 }
             }
             else {
-                qDebug() << "파일을 찾을 수 없습니다:" << programPath;
+                onStatusChangeFunc("파일을 찾을 수 없습니다:" + programPath);
             }
         }
     }
-
-    qDebug() << currentExecIdx + 1 << "번 프로세스 실행 중...";
 
     // 4. 딜레이 대기 후 다음 프로세스 진행 (Logic 2)
     int delayMs = proc.delay * 1000; // 초 단위를 밀리초로 변환
@@ -235,6 +260,60 @@ void Qt_Widgets_App_RoutineAutomator::executeNextProcess() {
     // 비동기 대기: UI가 멈추지 않으면서 지정된 시간 뒤에 다음 함수 호출
     QTimer::singleShot(delayMs, this, &Qt_Widgets_App_RoutineAutomator::executeNextProcess);
 }
+
+// 트레이 아이콘 생성 함수 로직
+void Qt_Widgets_App_RoutineAutomator::createTrayIcon() {
+    // 트레이 아이콘 객체 생성 이미 되어있는 상태이면 return;
+    if (trayIcon != nullptr) return;
+
+    // 트레이 아이콘 생성 및 기본 세팅
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setIcon(style()->standardIcon(QStyle::SP_ComputerIcon));
+    trayIcon->setToolTip("RoutineAutomator");
+
+    // 트레이 아이콘 메뉴 세팅 ( 열기, 종료 )
+    trayMenu = new QMenu(this);
+    trayMenu->addAction("열기", this, &QWidget::showNormal);
+    trayMenu->addAction("종료", this, &QCoreApplication::quit);
+
+    // 트레이 아이콘에 메뉴 연결하기
+    trayIcon->setContextMenu(trayMenu);
+
+    // 트레이 아이콘 보이기
+    trayIcon->show();
+}
+
+// 트레이 아이콘 제거 함수 로직
+void Qt_Widgets_App_RoutineAutomator::removeTrayIcon() {
+    // 트레이 아이콘이 이미 있을 경우 숨기고 제거하고 nullptr 초기화 진행
+    if (trayIcon) {
+        trayIcon->hide();
+        delete trayIcon;
+        trayIcon = nullptr;
+    }
+}
+
+// 트레이 아이콘 체크 시 프로그램 실행 유지 설정 함수 로직
+void Qt_Widgets_App_RoutineAutomator::closeEvent(QCloseEvent* event) {
+    // 트레이 아이콘이 켜져 있고, 사용자가 트레이 기능을 쓰겠다고 한 경우
+    if (trayIcon && trayIcon->isVisible() && ui.cb_trayIcon->isChecked()) {
+        this->hide();      // 창만 숨김
+        event->ignore();   // 종료 이벤트를 무시 (프로그램 유지)
+    }
+    else {
+        // 트레이 아이콘을 안 쓰거나 체크 해제 상태라면 정상 종료
+        event->accept();
+    }
+}
+
+// 설정 정보 저장 함수 로직
+void Qt_Widgets_App_RoutineAutomator::saveSetting() {
+    Settings set;
+    set.autoStart = ui.cb_autoStart->isChecked();
+    set.useTray = ui.cb_trayIcon->isChecked();
+    JsonDataManager::saveSettings(s_FilePath, set);
+}
+
 
 // 프로세스 추가 함수 로직
 void Qt_Widgets_App_RoutineAutomator::onAddProcClickFunc() {
@@ -370,16 +449,26 @@ void Qt_Widgets_App_RoutineAutomator::onAutoStartCheckFunc(int state) {
         settings.remove(appName);
         //qDebug() << "자동 실행 해제 완료";
     }
+
+    saveSetting();
 }
 
 // 트레리 아이콘 설정 함수 로직
-void Qt_Widgets_App_RoutineAutomator::onTrayIconCheckFunc() {
+void Qt_Widgets_App_RoutineAutomator::onTrayIconCheckFunc(int state) {
+    if (state == Qt::Checked) {
+        createTrayIcon();
+    }
+    else {
+        removeTrayIcon();
+    }
 
+    saveSetting();
 }
 
 // 상태 Label Text 변경 함수 로직
-void Qt_Widgets_App_RoutineAutomator::onStatusChangeFunc() {
-
+void Qt_Widgets_App_RoutineAutomator::onStatusChangeFunc(const QString& status) {
+    ui.lb_status->setText(status);
+	qDebug() << status;
 }
 
 

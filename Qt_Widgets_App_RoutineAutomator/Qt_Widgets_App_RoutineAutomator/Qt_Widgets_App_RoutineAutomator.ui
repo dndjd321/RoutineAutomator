@@ -12,6 +12,7 @@
   </property>
   <property name="font">
    <font>
+    <family>Malgun Gothic</family>
     <pointsize>12</pointsize>
     <bold>true</bold>
    </font>
@@ -21,6 +22,90 @@
   </property>
   <property name="windowTitle">
    <string>RoutineAutomator</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">/* 메인 창 배경 */
+QMainWindow {
+	background-color: #2b2b2b;
+}
+
+/* 모든 텍스트 기본 설정 */
+QWidget {
+	color: #dcdcdc;
+	font-family: &quot;Malgun Gothic&quot;; /* 한글 가독성 좋은 폰트 */
+}
+
+/* 구역을 나누는 선이나 테두리 (TreeWidget 등) */
+QTreeWidget, QGroupBox, QLineEdit {
+	background-color: #333333;
+	border: 1px solid #a5d6a7; /* 연두색 선 */
+	border-radius: 4px;
+	gridline-color: #444444;
+}
+
+/* 헤더 부분 */
+QHeaderView::section {
+	background-color: #3d3d3d;
+	color: #a5d6a7;
+	padding: 5px;
+	border: 0.5px solid #2b2b2b;
+}
+
+/* 버튼 스타일 */
+QPushButton {
+	background-color: #3d3d3d;
+	border: 1px solid #a5d6a7;
+	border-radius: 5px;
+	padding: 5px 15px;
+	min-height: 25px;
+}
+
+QPushButton:hover {
+	background-color: #4d4d4d;
+	border: 2px solid #c5e1a5; /* 호버 시 약간 더 밝은 연두 */
+}
+
+QPushButton:pressed {
+	background-color: #2b2b2b;
+}
+
+/* 체크박스 */
+QCheckBox::indicator {
+	width: 15px;
+	height: 15px;
+	border: 1px solid #a5d6a7;
+	background: #2b2b2b;
+}
+
+QCheckBox::indicator:checked {
+	background-color: #a5d6a7; /* 체크 시 연두색으로 채움 */
+}
+
+/* 상태 표시줄 */
+QStatusBar {
+	background-color: #2b2b2b;
+	color: #888888; /* 상태바 텍스트는 더 차분하게 */
+}
+
+/* 트레이 메뉴 및 모든 팝업 메뉴 설정 */
+QMenu {
+    background-color: #ffffff;      /* 메뉴 배경: 하얀색 */
+    color: #000000;                 /* 텍스트 색상: 검은색 (사용자 요청) */
+    border: 1px solid #dcdcdc;      /* 가느다란 회색 테두리 */
+}
+
+/* 메뉴 항목이 선택(마우스 오버) 되었을 때 */
+QMenu::item:selected {
+    background-color: #a5d6a7;      /* 우리가 정한 연두색으로 하이라이트 */
+    color: #000000;                 /* 선택되어도 글자는 검은색 유지 */
+}
+
+/* 메뉴 내부의 구분선 */
+QMenu::separator {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 5px;
+}</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QPushButton" name="pbtn_addProc">
@@ -34,7 +119,8 @@
     </property>
     <property name="font">
      <font>
-      <pointsize>15</pointsize>
+      <family>Malgun Gothic</family>
+      <pointsize>13</pointsize>
       <bold>true</bold>
      </font>
     </property>
@@ -45,21 +131,7 @@
      <enum>Qt::FocusPolicy::NoFocus</enum>
     </property>
     <property name="styleSheet">
-     <string notr="true">QPushButton{
-	border:1px solid #000000;
-	background-color : #ffffff;
-}
-
-QPushButton:hover{
-	border:1px solid #000000;
-	background-color : #f0f0f0;
-}
-
-QPushButton:pressed{
-	border:1px solid #060606;
-	background-color : #f4f4f4;
-}
-</string>
+     <string notr="true"/>
     </property>
     <property name="text">
      <string>+ 추가</string>
@@ -88,26 +160,13 @@ QPushButton:pressed{
     </property>
     <property name="font">
      <font>
-      <pointsize>15</pointsize>
+      <family>Malgun Gothic</family>
+      <pointsize>13</pointsize>
       <bold>true</bold>
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">QPushButton{
-	border:1px solid #000000;
-	background-color : #ffffff;
-}
-
-QPushButton:hover{
-	border:1px solid #000000;
-	background-color : #f0f0f0;
-}
-
-QPushButton:pressed{
-	border:1px solid #060606;
-	background-color : #f4f4f4;
-}
-</string>
+     <string notr="true"/>
     </property>
     <property name="text">
      <string>- 삭제</string>
@@ -124,26 +183,13 @@ QPushButton:pressed{
     </property>
     <property name="font">
      <font>
-      <pointsize>15</pointsize>
+      <family>Malgun Gothic</family>
+      <pointsize>13</pointsize>
       <bold>true</bold>
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">QPushButton{
-	border:1px solid #000000;
-	background-color : #ffffff;
-}
-
-QPushButton:hover{
-	border:1px solid #000000;
-	background-color : #f0f0f0;
-}
-
-QPushButton:pressed{
-	border:1px solid #060606;
-	background-color : #f4f4f4;
-}
-</string>
+     <string notr="true"/>
     </property>
     <property name="text">
      <string>↑ 위로 이동</string>
@@ -160,26 +206,13 @@ QPushButton:pressed{
     </property>
     <property name="font">
      <font>
-      <pointsize>15</pointsize>
+      <family>Malgun Gothic</family>
+      <pointsize>13</pointsize>
       <bold>true</bold>
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">QPushButton{
-	border:1px solid #000000;
-	background-color : #ffffff;
-}
-
-QPushButton:hover{
-	border:1px solid #000000;
-	background-color : #f0f0f0;
-}
-
-QPushButton:pressed{
-	border:1px solid #060606;
-	background-color : #f4f4f4;
-}
-</string>
+     <string notr="true"/>
     </property>
     <property name="text">
      <string>↓아래로 이동</string>
@@ -196,26 +229,13 @@ QPushButton:pressed{
     </property>
     <property name="font">
      <font>
-      <pointsize>15</pointsize>
+      <family>Malgun Gothic</family>
+      <pointsize>13</pointsize>
       <bold>true</bold>
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">QPushButton{
-	border:1px solid #000000;
-	background-color : #ffffff;
-}
-
-QPushButton:hover{
-	border:1px solid #000000;
-	background-color : #f0f0f0;
-}
-
-QPushButton:pressed{
-	border:1px solid #060606;
-	background-color : #f4f4f4;
-}
-</string>
+     <string notr="true"/>
     </property>
     <property name="text">
      <string>▶ 실행</string>
@@ -232,6 +252,7 @@ QPushButton:pressed{
     </property>
     <property name="font">
      <font>
+      <family>Malgun Gothic</family>
       <pointsize>12</pointsize>
       <bold>true</bold>
      </font>
@@ -254,6 +275,7 @@ QPushButton:pressed{
     </property>
     <property name="font">
      <font>
+      <family>Malgun Gothic</family>
       <pointsize>12</pointsize>
       <bold>true</bold>
      </font>
@@ -273,6 +295,7 @@ QPushButton:pressed{
     </property>
     <property name="font">
      <font>
+      <family>Malgun Gothic</family>
       <pointsize>12</pointsize>
       <bold>true</bold>
      </font>
@@ -292,12 +315,13 @@ QPushButton:pressed{
     </property>
     <property name="font">
      <font>
+      <family>Malgun Gothic</family>
       <pointsize>12</pointsize>
       <bold>true</bold>
      </font>
     </property>
     <property name="text">
-     <string>현재 진행 상황 TEXT</string>
+     <string>...</string>
     </property>
    </widget>
    <widget class="QTreeWidget" name="tw_procList">

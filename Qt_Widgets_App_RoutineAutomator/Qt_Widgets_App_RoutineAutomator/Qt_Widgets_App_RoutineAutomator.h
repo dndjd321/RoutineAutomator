@@ -24,13 +24,17 @@ private:
 
     //QList<Procs> procs = QList<Procs>(); //  C# 방식 
     QList<Procs> procs; // C++ 에서 일반적으로 선언하는 방식
-    QString j_FilePath;  // json 파일 저장 경로
+    QString j_FilePath;  // json 파일 저장 경로 ( 프로세스 정보 )
+    QString s_FilePath;     // json 파일 저장 경로 ( 설정 정보 )
 
     QSystemTrayIcon* trayIcon;
     QMenu* trayMenu;
     
-    void addTreeItem(Procs& p);   // TreeWidgetItem 추가 함수 선언
-    void reOrderTreeItems();      // TreeWidgetItem 순서 재정렬 함수 선언
+    void addTreeItem(Procs& p); // TreeWidgetItem 추가 함수 선언
+    void reOrderTreeItems();    // TreeWidgetItem 순서 재정렬 함수 선언
+    void createTrayIcon();      // 트레이 아이콘 생성 함수 선언  
+    void removeTrayIcon();      // 트레이 아이콘 제거 함수 선언
+	void saveSetting();         // 설정 저장 함수 선언
 
 private slots:  // UI 이벤트 처리 함수
 
@@ -43,16 +47,18 @@ private slots:  // UI 이벤트 처리 함수
 
     // 체크박스 제어 함수
     void onAutoStartCheckFunc(int state);
-    void onTrayIconCheckFunc();
+    void onTrayIconCheckFunc(int state);
 
     // 현재 진행 상황 제어 함수
-    void onStatusChangeFunc();
+    void onStatusChangeFunc(const QString& status);
 
     // 루틴 실행 함수 선언
     void startRoutine();
     // 다음 프로세스 실행 함수 선언
     void executeNextProcess();
 
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
 };
 
