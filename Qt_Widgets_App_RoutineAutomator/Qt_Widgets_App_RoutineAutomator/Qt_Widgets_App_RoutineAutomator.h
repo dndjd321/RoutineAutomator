@@ -35,6 +35,7 @@ private:
     void createTrayIcon();      // 트레이 아이콘 생성 함수 선언  
     void removeTrayIcon();      // 트레이 아이콘 제거 함수 선언
 	void saveSetting();         // 설정 저장 함수 선언
+    void startRoutineWithConfirmation();
 
 private slots:  // UI 이벤트 처리 함수
 

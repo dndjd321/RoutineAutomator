@@ -118,10 +118,17 @@
   <ItemGroup>
     <ClInclude Include="JsonDataManager.h" />
     <ClInclude Include="Procs.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Settings.h" />
     <QtMoc Include="Qt_WC_AddProcDialog.h" />
     <QtMoc Include="Qt_WC_RoutineOk.h" />
     <QtMoc Include="Qt_WC_RoutineReady.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\..\Users\User\Downloads\app_icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

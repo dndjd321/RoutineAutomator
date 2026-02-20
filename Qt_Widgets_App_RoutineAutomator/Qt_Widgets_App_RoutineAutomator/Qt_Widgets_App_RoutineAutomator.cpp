@@ -1,6 +1,7 @@
 ﻿#include "Qt_Widgets_App_RoutineAutomator.h"
 #include "Qt_WC_AddProcDialog.h"
 #include "Qt_WC_RoutineOk.h"
+#include "Qt_WC_RoutineReady.h"
 #include "jsonDataManager.h"
 #include <qscreen.h>
 #include <qguiapplication.h>
@@ -35,6 +36,8 @@ Qt_Widgets_App_RoutineAutomator::Qt_Widgets_App_RoutineAutomator(QWidget *parent
     : QMainWindow(parent)
 {
     ui.setupUi(this);
+
+    createTrayIcon();
 
     #pragma region 메인 창 크기 고정 
     // 메인 창 크기 고정
@@ -130,8 +133,6 @@ Qt_Widgets_App_RoutineAutomator::Qt_Widgets_App_RoutineAutomator(QWidget *parent
 
     // useTray 값에 따라 CheckBox 상태 설정
     ui.cb_trayIcon->setChecked(useTray);
-    
-    
 
     // 프로그램 실행 시 들어온 인자 리스트 확인
     QStringList args = QCoreApplication::arguments();
@@ -146,7 +147,14 @@ Qt_Widgets_App_RoutineAutomator::Qt_Widgets_App_RoutineAutomator(QWidget *parent
     }
     #pragma endregion
 
-
+    QIcon trayIconImg(":/Qt_Widgets_App_RoutineAutomator/app_icon.ico");
+    if (trayIconImg.isNull()) {
+        qDebug() << "트레이 아이콘 파일을 찾을 수 없습니다...";
+    }
+    else {
+        trayIcon->setIcon(trayIconImg);
+        this->setWindowIcon(trayIconImg);
+    }
 
 
 }
@@ -210,6 +218,8 @@ void Qt_Widgets_App_RoutineAutomator::startRoutine() {
 void Qt_Widgets_App_RoutineAutomator::executeNextProcess() {
     // 1. 모든 프로세스 실행 완료 체크
     if (currentExecIdx >= procs.size()) {
+        onStatusChangeFunc("작업 완료.");
+
         // 마지막 프로세스까지 완료되면 완료창 띄우기 (Logic 3)
         Qt_WC_RoutineOk* okDialog = new Qt_WC_RoutineOk(this);
         okDialog->setAttribute(Qt::WA_DeleteOnClose); // 닫히면 메모리 해제
@@ -295,14 +305,28 @@ void Qt_Widgets_App_RoutineAutomator::removeTrayIcon() {
 
 // 트레이 아이콘 체크 시 프로그램 실행 유지 설정 함수 로직
 void Qt_Widgets_App_RoutineAutomator::closeEvent(QCloseEvent* event) {
-    // 트레이 아이콘이 켜져 있고, 사용자가 트레이 기능을 쓰겠다고 한 경우
-    if (trayIcon && trayIcon->isVisible() && ui.cb_trayIcon->isChecked()) {
-        this->hide();      // 창만 숨김
-        event->ignore();   // 종료 이벤트를 무시 (프로그램 유지)
+    //// 트레이 아이콘이 켜져 있고, 사용자가 트레이 기능을 쓰겠다고 한 경우
+    //if (trayIcon && trayIcon->isVisible() && ui.cb_trayIcon->isChecked()) {
+    //    this->hide();      // 창만 숨김
+    //    event->ignore();   // 종료 이벤트를 무시 (프로그램 유지)
+    //}
+    //else {
+    //    // 트레이 아이콘을 안 쓰거나 체크 해제 상태라면 정상 종료
+    //    event->accept();
+    //}
+
+    // 만약 트레이 아이콘 체크박스가 해제된 상태라면?
+    if (!ui.cb_trayIcon->isChecked()) {
+        // 트레이 아이콘 숨기고 메모리 해제
+        if (trayIcon) {
+            trayIcon->hide();
+        }
+        QCoreApplication::quit(); // 앱 전체 완전 종료
     }
     else {
-        // 트레이 아이콘을 안 쓰거나 체크 해제 상태라면 정상 종료
-        event->accept();
+        // 트레이 아이콘 모드일 때는 창만 숨김
+        this->hide();
+        event->ignore(); // 종료 이벤트를 무시하여 프로세스 유지
     }
 }
 
@@ -471,5 +495,15 @@ void Qt_Widgets_App_RoutineAutomator::onStatusChangeFunc(const QString& status) 
 	qDebug() << status;
 }
 
+void Qt_Widgets_App_RoutineAutomator::startRoutineWithConfirmation() {
+    Qt_WC_RoutineReady readyDialog(this);
 
+    if (readyDialog.exec() == QDialog::Accepted) {
+        onStatusChangeFunc("루틴을 시작합니다.");
+        startRoutine();
+    }
+    else {
+        onStatusChangeFunc("사용자의 의해 루틴이 취소되었습니다.");
+    }
+}
 

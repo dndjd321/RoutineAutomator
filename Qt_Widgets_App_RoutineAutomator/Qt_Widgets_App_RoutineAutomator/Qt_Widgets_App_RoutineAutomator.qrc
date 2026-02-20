@@ -1,4 +1,5 @@
 <RCC>
-    <qresource prefix="Qt_Widgets_App_RoutineAutomator">
+    <qresource prefix="/Qt_Widgets_App_RoutineAutomator">
+        <file>app_icon.ico</file>
     </qresource>
 </RCC>
