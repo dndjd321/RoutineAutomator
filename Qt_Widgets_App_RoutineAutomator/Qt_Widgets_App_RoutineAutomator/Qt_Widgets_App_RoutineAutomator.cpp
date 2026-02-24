@@ -93,6 +93,7 @@ Qt_Widgets_App_RoutineAutomator::Qt_Widgets_App_RoutineAutomator(QWidget *parent
     //connect(ui.cb_autoStart, &QCheckBox::checkStateChanged, this, &Qt_Widgets_App_RoutineAutomator::onStatusChangeFunc);
     connect(ui.cb_autoStart, &QCheckBox::checkStateChanged, this, [this](int state) {
         onStatusChangeFunc(state == Qt::Checked ? "자동 실행 활성화" : "자동 실행 비활성화");
+        onAutoStartCheckFunc(state);
         });
 
     // 트레이 아이콘으로 실행 유지 설정 함수 연결
@@ -139,11 +140,15 @@ Qt_Widgets_App_RoutineAutomator::Qt_Widgets_App_RoutineAutomator(QWidget *parent
 
     if (args.contains("-auto")) {
         onStatusChangeFunc("윈도우 자동 실행으로 시작됨. 루틴을 즉시 실행합니다.");
-        if (ui.cb_trayIcon->isChecked()) {
-            this->hide();
-        }
+        
         // UI가 완전히 뜨기 전일 수 있으므로 약간의 여유를 두고 시작하거나 즉시 호출
-        QTimer::singleShot(1000, this, &Qt_Widgets_App_RoutineAutomator::startRoutine);
+        //QTimer::singleShot(1000, this, &Qt_Widgets_App_RoutineAutomator::startRoutine);
+        QTimer::singleShot(1000, this, [this]() {
+            if (ui.cb_trayIcon->isChecked()) {
+                this->hide();
+            }
+            this->startRoutine();
+        });
     }
     #pragma endregion
 
@@ -455,6 +460,7 @@ void Qt_Widgets_App_RoutineAutomator::onRunProcClickFunc() {
 void Qt_Widgets_App_RoutineAutomator::onAutoStartCheckFunc(int state) {
     // 윈도우 레지스트리 시작 프로그램 경로
     QString regPath = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run";
+    //QString regPath = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
     QSettings settings(regPath, QSettings::NativeFormat);
 
     // 프로그램 이름 (레지스트리에 표시될 키 이름)
@@ -467,11 +473,15 @@ void Qt_Widgets_App_RoutineAutomator::onAutoStartCheckFunc(int state) {
         // 1. 체크됨 -> 레지스트리에 등록
         settings.setValue(appName, autoRunPath);
         //qDebug() << "자동 실행 등록 완료:" << appPath;
+        // 2. 중요: 변경사항을 즉시 시스템에 반영하도록 강제함
+        settings.sync();
     }
     else {
         // 2. 체크 해제됨 -> 레지스트리에서 삭제
         settings.remove(appName);
         //qDebug() << "자동 실행 해제 완료";
+        // 2. 중요: 변경사항을 즉시 시스템에 반영하도록 강제함
+        settings.sync();
     }
 
     saveSetting();
