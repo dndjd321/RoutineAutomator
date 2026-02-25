@@ -35,6 +35,9 @@ Procs proc;
 Qt_Widgets_App_RoutineAutomator::Qt_Widgets_App_RoutineAutomator(QWidget *parent)
     : QMainWindow(parent)
 {
+    // 프로그램 실행 위치를 작업 디렉토리로 강제 설정
+    QDir::setCurrent(QCoreApplication::applicationDirPath());
+
     ui.setupUi(this);
 
     createTrayIcon();
@@ -458,33 +461,64 @@ void Qt_Widgets_App_RoutineAutomator::onRunProcClickFunc() {
 
 // 윈도우 시작 시 자동 실행 설정 함수 로직
 void Qt_Widgets_App_RoutineAutomator::onAutoStartCheckFunc(int state) {
-    // 윈도우 레지스트리 시작 프로그램 경로
-    QString regPath = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run";
-    //QString regPath = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
-    QSettings settings(regPath, QSettings::NativeFormat);
-
-    // 프로그램 이름 (레지스트리에 표시될 키 이름)
-    QString appName = "RoutineAutomator";
-    // 현재 실행 파일의 전체 경로
     QString appPath = QDir::toNativeSeparators(QCoreApplication::applicationFilePath());
-    QString autoRunPath = QString("\"%1\" -auto").arg(appPath);
+
+    // 작업 스케줄러에 등록할 실행 경로 (인수 포함)
+    QString taskRunCmd = QString("\"\\\"%1\\\" -auto\"").arg(appPath);
+
+    QProcess process;
 
     if (state == Qt::Checked) {
-        // 1. 체크됨 -> 레지스트리에 등록
-        settings.setValue(appName, autoRunPath);
-        //qDebug() << "자동 실행 등록 완료:" << appPath;
-        // 2. 중요: 변경사항을 즉시 시스템에 반영하도록 강제함
-        settings.sync();
+        // 1. 체크됨 -> 작업 스케줄러에 '가장 높은 권한(highest)'으로 로그온 시 실행되게 등록
+        QStringList args;
+        args << "/create" << "/tn" << "RoutineAutomator"
+            << "/tr" << taskRunCmd
+            << "/sc" << "onlogon"
+            << "/rl" << "highest"
+            << "/f"; // 기존에 있으면 덮어쓰기
+
+        process.start("schtasks", args);
+        process.waitForFinished();
     }
     else {
-        // 2. 체크 해제됨 -> 레지스트리에서 삭제
-        settings.remove(appName);
-        //qDebug() << "자동 실행 해제 완료";
-        // 2. 중요: 변경사항을 즉시 시스템에 반영하도록 강제함
-        settings.sync();
+        // 2. 체크 해제됨 -> 작업 스케줄러에서 삭제
+        QStringList args;
+        args << "/delete" << "/tn" << "RoutineAutomator" << "/f";
+
+        process.start("schtasks", args);
+        process.waitForFinished();
     }
 
     saveSetting();
+
+
+    //// 윈도우 레지스트리 시작 프로그램 경로
+    //QString regPath = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run";
+    ////QString regPath = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+    //QSettings settings(regPath, QSettings::NativeFormat);
+
+    //// 프로그램 이름 (레지스트리에 표시될 키 이름)
+    //QString appName = "RoutineAutomator";
+    //// 현재 실행 파일의 전체 경로
+    //QString appPath = QDir::toNativeSeparators(QCoreApplication::applicationFilePath());
+    //QString autoRunPath = QString("\"%1\" -auto").arg(appPath);
+
+    //if (state == Qt::Checked) {
+    //    // 1. 체크됨 -> 레지스트리에 등록
+    //    settings.setValue(appName, autoRunPath);
+    //    //qDebug() << "자동 실행 등록 완료:" << appPath;
+    //    // 2. 중요: 변경사항을 즉시 시스템에 반영하도록 강제함
+    //    settings.sync();
+    //}
+    //else {
+    //    // 2. 체크 해제됨 -> 레지스트리에서 삭제
+    //    settings.remove(appName);
+    //    //qDebug() << "자동 실행 해제 완료";
+    //    // 2. 중요: 변경사항을 즉시 시스템에 반영하도록 강제함
+    //    settings.sync();
+    //}
+
+    //saveSetting();
 }
 
 // 트레리 아이콘 설정 함수 로직
