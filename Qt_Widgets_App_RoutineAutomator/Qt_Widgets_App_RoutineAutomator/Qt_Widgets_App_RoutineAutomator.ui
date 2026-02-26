@@ -29,6 +29,11 @@ QMainWindow {
 	background-color: #2b2b2b;
 }
 
+/* 서브 창 배경 */
+QDialog {
+	background-color: #2b2b2b;
+}
+
 /* 모든 텍스트 기본 설정 */
 QWidget {
 	color: #dcdcdc;

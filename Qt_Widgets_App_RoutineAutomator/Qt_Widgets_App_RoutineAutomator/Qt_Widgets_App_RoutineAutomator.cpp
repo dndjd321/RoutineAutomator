@@ -209,6 +209,19 @@ void Qt_Widgets_App_RoutineAutomator::startRoutine() {
         return;
     }
 
+    // --- 1. 루틴 시작 전 준비 알림창 띄우기 ---
+    Qt_WC_RoutineReady readyDialog(this);
+
+    // exec()는 창이 닫힐 때까지 기다렸다가 결과를 반환합니다.
+    int result = readyDialog.exec();
+
+    // --- 2. 결과에 따른 처리 ---
+    if (result == QDialog::Rejected) {
+        // 사용자가 '아니오'를 누른 경우
+        // 여기서 바로 return 하여 아래의 실행 코드가 작동하지 않게 막습니다.
+        return;
+    }
+
     // 루틴 시작 시 버튼들을 못 누르게 막음
     ui.pbtn_runProc->setEnabled(false);
     ui.pbtn_addProc->setEnabled(false);
@@ -242,7 +255,9 @@ void Qt_Widgets_App_RoutineAutomator::executeNextProcess() {
         return;
     }
 
-    onStatusChangeFunc((currentExecIdx + 1) + "번 프로세스 실행 중...");
+    //onStatusChangeFunc((currentExecIdx + 1) + "번 프로세스 실행 중...");
+
+    onStatusChangeFunc(QString("%1번 프로세스 실행 중...").arg(currentExecIdx + 1));
 
     // 2. 현재 실행할 프로세스 정보 가져오기
     const Procs& proc = procs[currentExecIdx];
@@ -490,35 +505,6 @@ void Qt_Widgets_App_RoutineAutomator::onAutoStartCheckFunc(int state) {
     }
 
     saveSetting();
-
-
-    //// 윈도우 레지스트리 시작 프로그램 경로
-    //QString regPath = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run";
-    ////QString regPath = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
-    //QSettings settings(regPath, QSettings::NativeFormat);
-
-    //// 프로그램 이름 (레지스트리에 표시될 키 이름)
-    //QString appName = "RoutineAutomator";
-    //// 현재 실행 파일의 전체 경로
-    //QString appPath = QDir::toNativeSeparators(QCoreApplication::applicationFilePath());
-    //QString autoRunPath = QString("\"%1\" -auto").arg(appPath);
-
-    //if (state == Qt::Checked) {
-    //    // 1. 체크됨 -> 레지스트리에 등록
-    //    settings.setValue(appName, autoRunPath);
-    //    //qDebug() << "자동 실행 등록 완료:" << appPath;
-    //    // 2. 중요: 변경사항을 즉시 시스템에 반영하도록 강제함
-    //    settings.sync();
-    //}
-    //else {
-    //    // 2. 체크 해제됨 -> 레지스트리에서 삭제
-    //    settings.remove(appName);
-    //    //qDebug() << "자동 실행 해제 완료";
-    //    // 2. 중요: 변경사항을 즉시 시스템에 반영하도록 강제함
-    //    settings.sync();
-    //}
-
-    //saveSetting();
 }
 
 // 트레리 아이콘 설정 함수 로직
