@@ -63,16 +63,19 @@ void Qt_WC_AddProcDialog::SearchProcsFunc() {
 		ui.le_procDir->setText(filePath);
 
 		if (fileName.contains("chrome") || fileName.contains("firefox") || fileName.contains("opera") || fileName.contains("explorer")) {
-			//ui.rb_chkWeb->QRadioButton::isChecked();
-			//CheckChangeTypeFunc(ui.rb_chkWeb);
 			ui.rb_chkWeb->QRadioButton::setChecked(true);
 			ui.le_url->QLineEdit::setEnabled(true);
+
+			// WEB 타입 감지 시 중복 방지 enabled 끄기
+			ui.cb_chkDup->setChecked(false);
+			ui.cb_chkDup->setEnabled(false);
 		}
 		else{
-			//ui.rb_chkApp->QRadioButton::isChecked();
-			//CheckChangeTypeFunc(ui.rb_chkApp);
 			ui.rb_chkApp->QRadioButton::setChecked(true);
 			ui.le_url->QLineEdit::setEnabled(false);
+
+			// WEB 타입이 아닌 경우이면 중복 방지 enabled 켜기
+			ui.cb_chkDup->setEnabled(true);
 		}
 	}
 
@@ -80,7 +83,19 @@ void Qt_WC_AddProcDialog::SearchProcsFunc() {
 
 void Qt_WC_AddProcDialog::CheckChangeTypeFunc(QRadioButton* qrb) {
 	qrb->setChecked(true);
+
+	// WEB 버튼이 눌려져 있는지 확인
+	// WEB 일 경우이면 중복방지 체크 못하도록 설정하기
+	if (qrb == ui.rb_chkWeb) {
+		ui.cb_chkDup->setChecked(false);
+		ui.cb_chkDup->setEnabled(false);
+	}
+	else {
+		ui.cb_chkDup->setChecked(true);
+	}
+
 }
+
 
 void Qt_WC_AddProcDialog::AddProcOkFunc() {
 	// Procs 데이터 저장

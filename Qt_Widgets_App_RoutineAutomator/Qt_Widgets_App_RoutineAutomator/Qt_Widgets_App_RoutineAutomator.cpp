@@ -181,6 +181,10 @@ void Qt_Widgets_App_RoutineAutomator::addTreeItem(Procs& p) {
     tree_Item->setData(4, Qt::DisplayRole, p.delay);
     tree_Item->setCheckState(5, p.dup ? Qt::Checked : Qt::Unchecked);
 
+    if (p.type == "WEB") {
+        tree_Item->setFlags(tree_Item->flags() & ~Qt::ItemIsUserCheckable);
+    }
+
     ui.tw_procList->addTopLevelItem(tree_Item);
 }
 
@@ -241,17 +245,25 @@ void Qt_Widgets_App_RoutineAutomator::executeNextProcess() {
     if (currentExecIdx >= procs.size()) {
         onStatusChangeFunc("작업 완료.");
 
-        // 마지막 프로세스까지 완료되면 완료창 띄우기 (Logic 3)
-        Qt_WC_RoutineOk* okDialog = new Qt_WC_RoutineOk(this);
-        okDialog->setAttribute(Qt::WA_DeleteOnClose); // 닫히면 메모리 해제
-        okDialog->show();
-
         // 루틴 완료 후 버튼 활성화
         ui.pbtn_runProc->setEnabled(true);
         ui.pbtn_addProc->setEnabled(true);
         ui.pbtn_delProc->setEnabled(true);
         ui.pbtn_upProc->setEnabled(true);
         ui.pbtn_downProc->setEnabled(true);
+
+        //// 마지막 프로세스까지 완료되면 완료창 띄우기 (Logic 3)
+        //Qt_WC_RoutineOk* okDialog = new Qt_WC_RoutineOk(this);
+        //okDialog->setAttribute(Qt::WA_DeleteOnClose); // 닫히면 메모리 해제
+        //okDialog->show();
+
+        Qt_WC_RoutineOk okDialog(this);
+        okDialog.exec();
+
+        if (!ui.cb_trayIcon->isChecked()) {
+            QApplication::quit();
+        }
+        
         return;
     }
 
@@ -273,11 +285,40 @@ void Qt_Widgets_App_RoutineAutomator::executeNextProcess() {
         if (!programPath.isEmpty()) {
             // 1. 실행할 파일이 실제로 존재하는지 체크
             if (QFile::exists(programPath)) {
-                // 2. 프로그램 실행 (관리자 권한 계승)
-                bool success = QProcess::startDetached(programPath, QStringList());
 
-                if (!success) {
-                    onStatusChangeFunc("프로그램 실행 실패:" + programPath);
+                QFileInfo fileInfo(programPath);
+                QString exeName = fileInfo.fileName();
+
+                // 실행 여부를 결정할 플래그 변수
+                bool shouldRun = true;
+
+                // 중복 방지 로직 추가
+                if (proc.dup) {
+                    QProcess tasklist;
+
+                    // tasklist 명령어로 현재 해당 exe 파일이 실행 중인지 검색
+                    tasklist.start("tasklist", QStringList() << "/FI" << QString("IMAGENAME eq %1").arg(exeName));
+                    tasklist.waitForFinished();
+
+                    // 한글 윈도우 인코딩을 고려하여 결과 읽기
+                    QString output = QString::fromLocal8Bit(tasklist.readAllStandardOutput());
+
+                    // 검색 결과에 exe 이름이 있다면 이미 실행중인것임.
+                    if (output.contains(exeName, Qt::CaseInsensitive)) {
+                        shouldRun = false;
+                        onStatusChangeFunc(QString("중복 방지 >> %1은(는) 이미 실행 중입니다.").arg(exeName));
+                    }
+
+                }
+
+
+                if (shouldRun) {
+                    // 2. 프로그램 실행 (관리자 권한 계승)
+                    bool success = QProcess::startDetached(programPath, QStringList());
+
+                    if (!success) {
+                        onStatusChangeFunc("프로그램 실행 실패:" + programPath);
+                    }
                 }
             }
             else {
